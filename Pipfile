@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+scrapy = "*"
+scrapy-cloudflare-middleware = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
+
+[scripts]
+indeed = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/indeed_spider2.py -o ./../indeed.csv -a companies=$@ ' BASH_PARAM_TOMAKEITWORK"
+stepstone = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/stepstone_spider.py -o ./../stepstone.csv -a companies=$@' SAMEPARAMTHATGETSCONSUMED"
