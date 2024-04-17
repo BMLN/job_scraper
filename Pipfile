@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 scrapy = "*"
 scrapy-cloudflare-middleware = "*"
+argparse = "*"
 
 [dev-packages]
 
@@ -13,5 +14,6 @@ scrapy-cloudflare-middleware = "*"
 python_version = "3.12"
 
 [scripts]
-indeed = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/indeed_spider2.py -o ./../indeed.csv -a companies=$@ ' BASH_PARAM_TOMAKEITWORK"
-stepstone = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/stepstone_spider.py -o ./../stepstone.csv -a companies=$@' SAMEPARAMTHATGETSCONSUMED"
+crawl = "pipenv run python src/main.py"
+indeed = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/indeed_spider2.py -O ./../indeed.csv -a companies=$@ ' BASH_PARAM_TOMAKEITWORK"
+stepstone_deprc = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/stepstone_spider.py -O ./../stepstone.csv -a companies=$@' SAMEPARAMTHATGETSCONSUMED"

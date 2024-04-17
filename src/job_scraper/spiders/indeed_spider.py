@@ -1,5 +1,5 @@
 import scrapy
-import templ
+from job_scraper.spiders import templ
 import os
 
 
