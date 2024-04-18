@@ -1,6 +1,7 @@
 #import job_scraper
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerProcess, CrawlerRunner
 from scrapy.utils.project import get_project_settings
+from twisted.internet import defer, reactor
 
 from argparse import ArgumentParser
 import os
@@ -51,7 +52,7 @@ DEFAULT_COMPANIES = [
             "Symrise",
             "Volkswagen",
             "Vonovia",
-            "Zalando"][:2]
+            "Zalando"]
 urls = False 
 
 d = ["mercedes benz", "adidas ag"]
@@ -86,6 +87,9 @@ def crawl(spider_name, settings, input_list):
     process.start()
 
 
+def crawl1(settings):
+    return CrawlerRunner(settings)
+
 def read_field(path, field):
     out = None
     with open(path, "r") as file:
@@ -108,7 +112,10 @@ def already_exists(file_or_files):
         raise TypeError
 
 
-
+@defer.inlineCallbacks
+def crawl(processes):
+    for x in processes:
+        yield x.crawl()
 
 
 
@@ -118,7 +125,7 @@ def already_exists(file_or_files):
 if __name__ == "__main__":
     arg_parser = ArgumentParser(description="scrapes jobinformation from different websites")
 
-    arg_parser.add_argument("--companies", nargs="+", help="list of search", default=DEFAULT_COMPANIES)
+    arg_parser.add_argument("--companies", nargs="+", help="list of search", default=DEFAULT_COMPANIES)#[:2])
     arg_parser.add_argument("--settings", type=str, help="path of settings.py", default=None)
     arg_parser.add_argument("--force", action="store_true", help="flag to force crawling even if a file already exists", default=False)
 
@@ -134,7 +141,7 @@ if __name__ == "__main__":
     if args["settings"] != None:
         os.environ["SCRAPY_SETTINGS_MODULE"] = args["settings"]
     settings = get_project_settings()
-    
+
 
 
     #run
@@ -162,6 +169,5 @@ if __name__ == "__main__":
                 __output_types = list(__spiders[x].values())[1].outputs()
                 output_settings = output_feeds(__output_files, __output_types)
 
-                print("started")
                 settings.set("FEEDS", output_settings)
                 crawl(spider_name, settings, inputlist)

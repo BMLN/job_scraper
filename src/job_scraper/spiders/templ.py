@@ -42,6 +42,31 @@ class Error(Item):
 
 
 
+class Key_Scraper(ABC, Spider):
+    def __init__(self):
+        pass
+
+
+    #interface
+
+    def parse(self, response):
+        yield self.extract_key(response)
+
+
+
+    #interface requirements
+
+    @abstractmethod
+    def extract_key(self, selector):
+        pass
+
+
+
+
+
+
+
+
 class JobSearch_Scraper(ABC, Spider):
     __mappings = ["search", ""]
 

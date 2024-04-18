@@ -40,7 +40,6 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
                 url = response.request.url,
                 err = "err"
             )
-            #return #write to other file
 
 
     @override
@@ -67,7 +66,7 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
         base = self.__general_search_url if is_company is False else self.__company_search_url
         #return "file:///Users/lorandbanki/Desktop/Arbeit/job_scraper/xpathstuff2.html"
         #return "file:///Users/lorandbanki/Desktop/Arbeit/job_scraper/jobsite.html"
-        url = templ.Url(base(company = company))\
+        url = templ.Url(base.format(company = company))\
             .param("fu", 1000000)\
             .param("ct", 229)
 

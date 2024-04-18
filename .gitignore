@@ -1,6 +1,7 @@
 .venv
 .env
 output
+html
 test.sh
 xmpljob.html
 xpath.html
