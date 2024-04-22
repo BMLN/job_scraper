@@ -85,6 +85,7 @@ class JobScraperDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+
         request.meta["proxy"] = self.proxy
 
 

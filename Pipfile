@@ -7,6 +7,12 @@ name = "pypi"
 scrapy = "*"
 scrapy-cloudflare-middleware = "*"
 argparse = "*"
+#js mapping requirements 
+scrapy-selenium = "*"
+selenium = "*"
+webdriver-manager = "*"
+pandas = "*"
+scrapeops-scrapy-proxy-sdk = "*"
 
 [dev-packages]
 
@@ -15,5 +21,6 @@ python_version = "3.12"
 
 [scripts]
 crawl = "pipenv run python src/main.py"
+test = "pipenv run python src/test.py"
 indeed = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/indeed_spider2.py -O ./../indeed.csv -a companies=$@ ' BASH_PARAM_TOMAKEITWORK"
 stepstone_deprc = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/stepstone_spider.py -O ./../stepstone.csv -a companies=$@' SAMEPARAMTHATGETSCONSUMED"

@@ -17,6 +17,7 @@ from os import environ
 PROXY_HOST = environ.get("PROXY_HOST")
 PROXY_AUTH = environ.get("PROXY_AUTH")
 
+SCRAPEOPS_API_KEY = environ.get("SCRAPEOPS_API_KEY")
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -57,7 +58,8 @@ CONCURRENT_REQUESTS_PER_IP = 1
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    "job_scraper.middlewares.JobScraperDownloaderMiddleware": 350,
+    #"job_scraper.middlewares.JobScraperDownloaderMiddleware": 350,
+    "scrapeops_scrapy_proxy_sdk.scrapeops_scrapy_proxy_sdk.ScrapeOpsScrapyProxySdk" : 725
     #"job_scraper.middlewares.JobScraperDownloaderMiddleware": 543,
     #"scrapy_cloudflare_middleware.middlewares.CloudFlareMiddleware", 560,
 }

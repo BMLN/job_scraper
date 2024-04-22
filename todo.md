@@ -6,7 +6,9 @@
 - [ ] all value information is behind unstructured text
 - [ ] allow both company and tag search: implement with 2 different params
 - [ ] running the spiders sequentially
-
+- [ ] scrapy itself doesn't work with its configuration, only call modules from script
+- [ ] general webdriver initialisation
+- [ ] optimizie mappings parsing
 
 
 #### problems
@@ -16,3 +18,7 @@ DONE
 - 409 error 
 MAYBE? using 1 concurrent requests now
 - sometimes request just doesn't apply filters? feels random also in regular use
+
+
+
+NO NEED FOR SELENIUM! -> indeed contains elements, just show = false

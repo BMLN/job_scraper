@@ -12,7 +12,7 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
     allowed_domains = ["stepstone.de"]
 
     __general_search_url = "https://www.stepstone.de/jobs/{company}"
-    __company_search_url = "https://www.stepstone.de/cmp/de{company}/jobs"
+    __company_search_url = "https://www.stepstone.de/cmp/de/{company}/jobs"
     __extractor = scrapy.linkextractors.LinkExtractor(
         #allow = "/www\.stepstone\.de\/stellenangebote--.*/",
         allow = "/stellenangebote--", #some problems with regex, rly correct?
@@ -42,12 +42,12 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
             )
 
 
-    @override
-    def exctract_nextpage(self, selector):
-        if self.has_applied_filters(selector):
-            super().extract_nextpage(selector)
-        else:
-            return None
+    # @override
+    # def extract_nextpage(self, selector):
+    #     if self.has_applied_filters(selector):
+    #         super().extract_nextpage(selector)
+    #     else:
+    #         return None
 
 
     @override
@@ -77,6 +77,7 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
         links = self.__extractor.extract_links(selector)
         return [ str(x.url) for x in links ]
 
+    #TODO: add filtercheck
     @override
     def extract_nextpage(self, selector):
         nxt = selector.xpath("//nav[contains(@aria-label, 'pagination')]//a[@href]/@href").extract()
@@ -85,8 +86,6 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
             return nxt[-1]
         else:
             return None
-
-    
 
 
 

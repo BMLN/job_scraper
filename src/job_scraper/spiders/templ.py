@@ -42,22 +42,36 @@ class Error(Item):
 
 
 
-class Key_Scraper(ABC, Spider):
-    def __init__(self):
-        pass
+class Mapping_Scraper(ABC, Spider):
+
+    def __init__(self, search_tags=[]):#, keys=[]):
+        super(Spider, self).__init__()
+        self.start_urls = [ self.searchurl_for(search_tag) for search_tag in search_tags ]
+        #self.
+
+    # def __init__(self, searches=[], keys=[]): #{fields : keys} -> values
+    #     super(Spider, self).__init__()
+    #     self.__config = config
+    #     self.__extractors =  [ key : values for key, values in self.mappings().items() if key in keys ]
+
 
 
     #interface
 
     def parse(self, response):
-        yield self.extract_key(response)
+        for x in self.mappings():
+            yield x(response)
 
 
 
     #interface requirements
 
     @abstractmethod
-    def extract_key(self, selector):
+    def searchurl_for(self, search_tag) -> Url:
+        pass
+
+    @abstractmethod
+    def mappings(self):
         pass
 
 
@@ -68,7 +82,6 @@ class Key_Scraper(ABC, Spider):
 
 
 class JobSearch_Scraper(ABC, Spider):
-    __mappings = ["search", ""]
 
     def __init__(self, companies=[]):
         super(Spider, self).__init__()
@@ -86,12 +99,13 @@ class JobSearch_Scraper(ABC, Spider):
     #interface
 
     def parse(self, response):
+        source = self.extract_source(response)
         jobs = self.extract_joburls(response)
         next = self.extract_nextpage(response)
 
         for x in jobs:
             for func in self.data_extractors():
-                yield func(x) 
+                yield func(source, x) 
              #(self.parse_job(response))#yield {"url":x}
             #for each joburl, apply each func of get_extracts()
             #yield Request(x, callback=self.parse_job)
@@ -102,7 +116,7 @@ class JobSearch_Scraper(ABC, Spider):
 
 
     def data_extractors(self):
-        return [ lambda x: {"joburl" : str(x)} ]
+        return [ lambda source, joburl: {"source" : str(source), "joburl" : str(joburl)} ]
 
 
     def outputs():
@@ -114,6 +128,10 @@ class JobSearch_Scraper(ABC, Spider):
 
     @abstractmethod
     def searchurl_for(self, company) -> Url:
+        pass
+
+    @abstractmethod
+    def extract_source(self, response):
         pass
 
     @abstractmethod
@@ -150,9 +168,10 @@ class JobInfo_Scraper(ABC, Spider):
             "Tätigkeitsbereich": None,
             "Aufgaben": self.extract_tasks(response),
             "Qualifikationen": self.extract_qualifications(response),
-            "etc": None,
+            "etc": self.extract_etc(response),
             "Standort": self.extract_location(response),
-            "type": self.extract_employment(response)
+            "type": self.extract_employment(response),
+            "raw_text": self.extract_rawtext(response)
         }
 
 
@@ -185,4 +204,12 @@ class JobInfo_Scraper(ABC, Spider):
 
     @abstractmethod
     def extract_qualifications(self, selector) -> str:
+        pass
+
+    @abstractmethod
+    def extract_etc(self, selector) -> str:
+        pass
+
+    @abstractmethod
+    def extract_rawtext(self, selector) -> str:
         pass

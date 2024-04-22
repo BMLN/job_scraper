@@ -61,6 +61,8 @@ __spiders = {
     "stepstone": {
             "stepstone_jobsearch_spider" : stepstone.Stepstone_JobSearch_Scraper,
             "stepstone_jobinfo_spider" : stepstone.Stepstone_JobInfo_Scraper
+    },
+    "arbeitsagentur": {
     }
 }
 
@@ -134,6 +136,11 @@ if __name__ == "__main__":
     arg_parser.add_argument("--stepstone_joburls", nargs="+", help="provides stepstone jobs", default=["./output/stepstone_jobs.csv", "./output/stepstone_err.csv"])
     arg_parser.add_argument("--stepstone_jobinfo", type=str, help="path of settings.py", default="./output/stepstone_jobs.csv")
 
+    arg_parser.add_argument("--arbeitsagentur", action="append_const", const="arbeitsagentur", dest="crawlers", help="flag to crawl arbeitsagentur")
+    arg_parser.add_argument("--arbeitsagentur_joburls", nargs="+", help="provides arbeitsagentur jobs", default="./output/arbeitsagentur_jobs.csv")
+    arg_parser.add_argument("--arbeitsagentur_jobinfo", type=str, help="path of settings.py", default="./output/arbeitsagentur_jobs.csv")
+
+    
 
 
     #set argument
