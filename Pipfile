@@ -21,6 +21,7 @@ python_version = "3.12"
 
 [scripts]
 crawl = "pipenv run python src/main.py"
+crawl_all = "pipenv run python src/main.py --getinit_urls --indeed_urls --stepstone_urls --getinit_info --indeed_info --stepstone_info"
 test = "pipenv run python src/test.py"
 indeed = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/indeed_spider2.py -O ./../indeed.csv -a companies=$@ ' BASH_PARAM_TOMAKEITWORK"
 stepstone_deprc = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/stepstone_spider.py -O ./../stepstone.csv -a companies=$@' SAMEPARAMTHATGETSCONSUMED"

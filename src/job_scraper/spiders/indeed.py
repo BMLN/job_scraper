@@ -1,16 +1,16 @@
 #sc_tags
 # no entry vs just cant search -> use a filter check?
 mappings_comp = {
-    "adidas": "0kf%3Afcckey%287f9e37cf52823de0%29%3B",
-    "airbus": "0kf%3Afcckey%28542cd993303a0af1%29%3B",
-    "allianz": "0kf%3Afcckey%2849c194c298f9e8ab%29%3B",
-    "basf": "0kf%3Afcckey%28e52b8d98ce1b9bd6%29%3B",
-    "bayer": "0kf%3Afcckey%28c80e7ceae59adb32%29%3B",
-    "beiersdorf": "0kf%3Afcckey%28c3f07f3464f67ce1%29%3B",
-    "bmw": "0kf%3Afcckey%28f3774117e317f6fe%29%3B",
+    "Adidas": "0kf%3Afcckey%287f9e37cf52823de0%29%3B",
+    "Airbus": "0kf%3Afcckey%28542cd993303a0af1%29%3B",
+    "Allianz": "0kf%3Afcckey%2849c194c298f9e8ab%29%3B",
+    "BASF": "0kf%3Afcckey%28e52b8d98ce1b9bd6%29%3B",
+    "Bayer": "0kf%3Afcckey%28c80e7ceae59adb32%29%3B",
+    "Beiersdorf": "0kf%3Afcckey%28c3f07f3464f67ce1%29%3B",
+    "BMW": "0kf%3Afcckey%28f3774117e317f6fe%29%3B",
     "Brenntag": "0kf%3Afcckey%285f55c55b3d54bcad%29%3B",
     "Commerzbank": None,  #cant access
-    "Contintental": "0kf%3Afcckey%28a622be31ab4d1630%29%3B",
+    "Continental": "0kf%3Afcckey%28a622be31ab4d1630%29%3B",
     "Covestro": "0kf%3Afcckey%28eac8463a66841599%29%3B",
     "Daimler Truck": "0kf%3Afcckey%288462355875d09496%29%3B",
     "Deutsche Bank": "0kf%3Afcckey%282c15c2180b5fa05e%29%3B",
@@ -47,8 +47,8 @@ mappings_comp = { key : unquote(value) if value != None else None for key, value
 
 #IT = "cmpsec%28NKR5F%29"
 searchs = {
-    "adidas": "0kf%3Afcckey%287f9e37cf52823de0%29cmpsec%28NKR5F%29%3B",
-    "airbus": "0kf%3Afcckey%28542cd993303a0af1%29cmpsec%28NKR5F%29%3B",
+    "Adidas": "0kf%3Afcckey%287f9e37cf52823de0%29cmpsec%28NKR5F%29%3B",
+    "Airbus": "0kf%3Afcckey%28542cd993303a0af1%29cmpsec%28NKR5F%29%3B",
     "allianz": "0kf%3Afcckey%2849c194c298f9e8ab%29cmpsec%28NKR5F%29%3B",
     "basf": "0kf%3Afcckey%28e52b8d98ce1b9bd6%29cmpsec%28NKR5F%29%3B",
     "bayer": "0kf%3Afcckey%28c80e7ceae59adb32%29cmpsec%28NKR5F%29%3B",
@@ -242,7 +242,7 @@ class Indeed_JobSearch_Scraper(templ.JobSearch_Scraper):
 
 #TODO:
 
-class indeed_JobInfo_Scraper(templ.JobInfo_Scraper):
+class Indeed_JobInfo_Scraper(templ.JobInfo_Scraper):
     
     name = "indeed_jobinfo_spider"
     allowed_domains = ["de.indeed.com"]

@@ -3,11 +3,9 @@
 output
 html
 test.sh
-xmpljob.html
-xpath.html
 xpathstuff.py
 stepstone.csv
 indeed.csv
 stepstone2.csv
-xpathstuff2.html
 jobsite.html
+.DS_Store

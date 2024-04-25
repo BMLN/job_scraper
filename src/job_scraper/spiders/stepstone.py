@@ -49,6 +49,12 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
     #     else:
     #         return None
 
+    #TODO
+    @override 
+    def extract_source(self, selector):
+        return None
+
+
 
     @override
     def outputs():
@@ -74,8 +80,12 @@ class Stepstone_JobSearch_Scraper(templ.JobSearch_Scraper):
 
     @override
     def extract_joburls(self, selector):
-        links = self.__extractor.extract_links(selector)
-        return [ str(x.url) for x in links ]
+        if self.has_applied_filters(selector, 2):
+            links = self.__extractor.extract_links(selector)
+            return [ str(x.url) for x in links ]
+        else:
+            print("yh")
+            return []
 
     #TODO: add filtercheck
     @override
@@ -152,3 +162,12 @@ class Stepstone_JobInfo_Scraper(templ.JobInfo_Scraper):
         qualifications = selector.xpath("//div[contains(@data-at, 'content-container')][1]").xpath(".//div[contains(@class, 'text-profile')]").xpath(".//ul//child::*//text()") 
 
         return qualifications.getall()
+
+
+    @override 
+    def extract_etc(self, selector):
+        return None
+
+    @override
+    def extract_rawtext(self, selector):
+        return selector.xpath("//div[@data-atx-component='JobAdContent']//text()").getall()

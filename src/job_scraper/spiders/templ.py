@@ -86,7 +86,7 @@ class JobSearch_Scraper(ABC, Spider):
     def __init__(self, companies=[]):
         super(Spider, self).__init__()
         
-        self.start_urls = [ self.searchurl_for(company_name) for company_name in companies ]
+        self.start_urls = [ self.searchurl_for(company_name) for company_name in companies ][:20]
         #if urls:
         #    self.data_extractors = lambda x: {"url": x}
         #self.linkextractor = self.extractor()
