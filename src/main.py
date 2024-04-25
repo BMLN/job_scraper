@@ -89,7 +89,7 @@ def read_field(path, field):
     out = None
     with open(path, "r") as file:
         data = DictReader(file)
-        out = [ x[field] for x in data ][:2]
+        out = [ x[field] for x in data ]
 
     return out
 

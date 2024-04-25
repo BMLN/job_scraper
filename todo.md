@@ -19,6 +19,7 @@ DONE
 MAYBE? using 1 concurrent requests now
 - sometimes request just doesn't apply filters? feels random also in regular use
 
+!!!!INDEED mappings still dont filter out None fields!!!
 
 
 NO NEED FOR SELENIUM! -> indeed contains elements, just show = false
