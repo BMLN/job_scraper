@@ -1,11 +1,9 @@
 .venv
 .env
 output
+input
 html
 test.sh
 xpathstuff.py
-stepstone.csv
-indeed.csv
-stepstone2.csv
-jobsite.html
+test.py
 .DS_Store

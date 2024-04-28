@@ -262,8 +262,10 @@ class Indeed_JobInfo_Scraper(templ.JobInfo_Scraper):
     def extract_company(self, selector):
         
         output = selector.xpath("//div[@data-testid='jobsearch-CompanyInfoContainer']//text()").getall()
+        output = [ x for x in output if ("css" in x ) == False] #why necessary ? :o only running spider demanding it, fine with html otherwise
+
         if len(output) > 0:
-            output = output[1]
+            output = output[0]
 
         return output
 
@@ -274,12 +276,17 @@ class Indeed_JobInfo_Scraper(templ.JobInfo_Scraper):
         return selector.xpath("//div[@class='jobsearch-BodyContainer']//div[@id='jobLocationText']//text()").get()
         
 
-
     @override
     def extract_employment(self, selector):
-        
-        return selector.xpath("//div[@id='salaryInfoAndJobType']//text()").get()
-        
+        output = selector.xpath("//div[@id='salaryInfoAndJobType']//text()").getall()
+        print(output)
+
+        output = [ x for x in output if ("css" in x ) == False] #why necessary ? :o only running spider demanding it, fine with html otherwise
+
+        if len(output) > 0:
+            output = output[0]
+
+        return output        
 
 
     @override
@@ -311,3 +318,8 @@ class Indeed_JobInfo_Scraper(templ.JobInfo_Scraper):
         
 
         return output
+    
+
+    @override 
+    def extract_jobnode(self, selector):
+        return selector.xpath("//div[contains(@class, 'jobsearch-JobComponent-description')]").get()

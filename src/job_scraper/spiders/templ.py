@@ -80,14 +80,15 @@ class Mapping_Scraper(ABC, Spider):
 
 
 
-
+#TODO: source from initial requests
+#TODO: remove janky implementation for != None urls
 class JobSearch_Scraper(ABC, Spider):
 
     def __init__(self, companies=[]):
         super(Spider, self).__init__()
         
         self.start_urls = [ self.searchurl_for(company_name) for company_name in companies ]
-        self.start_urls = [ x for x in self.start_urls if (str(None) in x) == False ]
+        self.start_urls = [ x for x in self.start_urls if (str(None) in x) == False ]#[:5] #TODO: REMOVE AFTER TESTING 
         #if urls:
         #    self.data_extractors = lambda x: {"url": x}
         #self.linkextractor = self.extractor()
@@ -155,7 +156,7 @@ class JobInfo_Scraper(ABC, Spider):
 
     def __init__(self, jobs=[]):
         super(Spider, self).__init__()
-        self.start_urls = jobs
+        self.start_urls = jobs#[:1] #TODO: REMOVE AFTER TESTING
 
 
     # Interface
@@ -166,13 +167,14 @@ class JobInfo_Scraper(ABC, Spider):
         yield {
             "Name": self.extract_company(response),
             "Jobbezeichnung": self.extract_jobtitle(response),
-            "Tätigkeitsbereich": None,
-            "Aufgaben": self.extract_tasks(response),
-            "Qualifikationen": self.extract_qualifications(response),
-            "etc": self.extract_etc(response),
+            #"Tätigkeitsbereich": None,
+            #"Aufgaben": self.extract_tasks(response),
+            #"Qualifikationen": self.extract_qualifications(response),
+            #"etc": self.extract_etc(response),
             "Standort": self.extract_location(response),
-            "type": self.extract_employment(response),
-            "raw_text": self.extract_rawtext(response)
+            "Anstellungsart": self.extract_employment(response),
+            "job_node" : self.extract_jobnode(response)
+            #"raw_text": self.extract_rawtext(response)
         }
 
 
@@ -200,17 +202,26 @@ class JobInfo_Scraper(ABC, Spider):
         pass
 
     @abstractmethod
+    def extract_jobnode(self, selector) -> str:
+        pass
+
+    
+    #DEPR - move to TM/IE
+    @abstractmethod
     def extract_tasks(self, selector) -> str:
         pass
 
+    #DEPR - move to TM/IE
     @abstractmethod
     def extract_qualifications(self, selector) -> str:
         pass
 
+    #DEPR - move to TM/IE
     @abstractmethod
     def extract_etc(self, selector) -> str:
         pass
 
+    #DEPR - move to TM/IE
     @abstractmethod
     def extract_rawtext(self, selector) -> str:
         pass

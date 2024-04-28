@@ -217,4 +217,10 @@ class Stepstone_JobInfo_Scraper(templ.JobInfo_Scraper):
 
     @override
     def extract_rawtext(self, selector):
-        return selector.xpath("//div[@data-atx-component='JobAdContent']//text()").getall()
+        #return selector.xpath("//div[@data-atx-component='JobAdContent']//text()").getall()
+        return None
+
+
+    @override
+    def extract_jobnode(self, selector):
+        return selector.xpath("//div[@data-atx-component='JobAdContent']").get()
