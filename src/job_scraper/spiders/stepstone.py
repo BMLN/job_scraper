@@ -3,6 +3,7 @@ from job_scraper.spiders import templ
 from typing import override
 import re
 import logging
+from urllib.parse import unquote
 
 
 
@@ -49,6 +50,78 @@ mappings_comp = {
     "Vonovia": "vonovia-76597",
     "Zalando": "zalando-se-71523"
 }
+
+
+
+
+
+
+
+
+class Stepstone_CompanyMapping_Scraper(templ.Mapping_Scraper):
+    name = "stepstone_companymapping_spider"
+    allowed_domains = ["www.stepstone.de"]
+    __search_url = "https://www.stepstone.de/jobs/{search_tag}"
+
+
+
+
+    # interface requirements
+    
+
+    @override
+    def searchurl_for(self, search_tag):
+
+        #return r"C:\Users\Lorand\Documents\Arbeit\april - 2024\job_scraper\input\stepstone_search.html"
+        base = self.__search_url
+        url = templ.Url(base.format(search_tag = "SAP SE"))\
+            .param("fu", 1000000)
+
+        return str(url)
+
+
+    #TODO: proper tagging
+    @override
+    def source_tag(self, response):
+        src = response.request.url
+        if "scrapeops" in src:
+            src = unquote(src)
+        src = src[src.index("/jobs/")+len("/jobs/"):]
+        if "?" in src:
+            src = src[:src.index("?")]
+
+        return unquote(src)
+
+
+    @override
+    def mappings(self, response, tag):
+        output = []
+        comp_name = tag.lower().replace(" ", "-")
+        job_postings = response.xpath("(//div[@data-genesis-element = 'CARD_GROUP_CONTAINER'])[1]//article")
+
+        for x in job_postings:
+            company_name = str(x.xpath(".//span[@data-at = 'job-item-company-name']//text()").get())
+            mapping = str(x.xpath(".//a[@data-genesis-element = 'COMPANY_LOGO_LINK']//@href").get())
+            print(comp_name, company_name)
+            if comp_name in company_name.lower().replace(" ", "-"): #MORE
+                mapping = mapping[:mapping.rindex("/jobs")] if "/jobs" in mapping else ""
+                mapping = mapping[mapping.rindex("/")+1:] if "/" in mapping else ""
+                
+                output.append(
+                    {
+                        "name": company_name, "mapping": mapping
+                    }
+                )
+            
+
+        return list(set(output))
+
+
+
+
+
+
+
 
 
 #TODO: none cmps arent filtered
