@@ -44,9 +44,9 @@ class Error(Item):
 
 class Mapping_Scraper(ABC, Spider):
 
-    def __init__(self, search_tags=[]):#, keys=[]):
+    def __init__(self, tags=[]):#, keys=[]):
         super(Spider, self).__init__()
-        self.start_urls = [ self.searchurl_for(search_tag) for search_tag in search_tags ]
+        self.start_urls = [ self.searchurl_for(tag) for tag in tags ]
         #self.
 
     # def __init__(self, searches=[], keys=[]): #{fields : keys} -> values
@@ -59,19 +59,27 @@ class Mapping_Scraper(ABC, Spider):
     #interface
 
     def parse(self, response):
-        for x in self.mappings():
-            yield x(response)
+        
+        source_tag = self.source_tag(response)
+
+        for x in self.mappings(response, source_tag):
+            yield { "source_tag" : source_tag} | x
+
 
 
 
     #interface requirements
 
     @abstractmethod
-    def searchurl_for(self, search_tag) -> Url:
+    def searchurl_for(self, tag) -> Url:
         pass
 
     @abstractmethod
-    def mappings(self):
+    def source_tag(self, response) -> str:
+        pass
+
+    @abstractmethod
+    def mappings(self, response, tag):
         pass
 
 

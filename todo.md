@@ -10,6 +10,8 @@
 - [ ] general webdriver initialisation
 - [ ] optimizie mappings parsing
 - [ ] indeed doesnt seem to filter if not in passed companies list
+- [ ] better initial tag setting
+
 
 #### problems
 - regular jobsearch params don't transfer from url BUT it does in company search -> change to company intern search !!! funktioniert doch: keine action

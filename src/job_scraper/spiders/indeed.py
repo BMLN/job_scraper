@@ -114,76 +114,116 @@ from selenium.webdriver.common.by import By
 import os
 
 #TODO: finish, selenium x proxy request -> problematic?
-class Indeed_Mapping_Scraper(templ.Mapping_Scraper):
-    name = "indeed_mapping_spider"
+class Indeed_CompanyMapping_Scraper(templ.Mapping_Scraper):
+    name = "indeed_companymapping_spider"
     allowed_domains = ["de.indeed.com"]
-
-    #aleister = webdriver.Safari()
-    #print(which("safaridriver"))
-    #aleister.get("http://www.python.org")
-
-    #aleister = webdriver.Chrome()
-    #print(which("safaridriver"))
-    #aleister.get("http://www.python.org")
-
-    #todo: change2general configuration
-    x = {
-        "SELENIUM_DRIVER_NAME" : "chrome",
-        "SELENIUM_DRIVER_EXECUTABLE_PATH" : None, #which("safaridriver"),
-        "SELENIUM_DRIVER_ARGUMENTS" : ["-headless", "--log-level=3"],
-        #"DOWNLOADER_MIDDLEWARES" : {
-        #    "scrapy_selenium.SeleniumMiddleware": 800
-        #}
-        "DOWNLOADER_MIDDLEWARES" : {
-            "job_scraper.middlewares.JobScraperDownloaderMiddleware": 350,
-            "job_scraper.selenium.middlewares.SeleniumMiddleware": 800,
-        }
-    }  
-    settings = get_project_settings()
-    settings.setdict(x)
-
-    custom_settings = settings
     __general_url = "https://de.indeed.com/jobs"
 
 
-    @override
-    def start_requests(self):
-        return [
-            SeleniumRequest(
-                url=start_url,
-                callback=self.parse,
-                #wait_until=EC.element_to_be_clickable
-            ) for start_url in self.start_urls
-        ]
+    #selenium setuptesting
+
+    # #aleister = webdriver.Safari()
+    # #print(which("safaridriver"))
+    # #aleister.get("http://www.python.org")
+
+    # #aleister = webdriver.Chrome()
+    # #print(which("safaridriver"))
+    # #aleister.get("http://www.python.org")
+
+    # #todo: change2general configuration
+    # x = {
+    #     "SELENIUM_DRIVER_NAME" : "chrome",
+    #     "SELENIUM_DRIVER_EXECUTABLE_PATH" : None, #which("safaridriver"),
+    #     "SELENIUM_DRIVER_ARGUMENTS" : ["-headless", "--log-level=3"],
+    #     #"DOWNLOADER_MIDDLEWARES" : {
+    #     #    "scrapy_selenium.SeleniumMiddleware": 800
+    #     #}
+    #     "DOWNLOADER_MIDDLEWARES" : {
+    #         "job_scraper.middlewares.JobScraperDownloaderMiddleware": 350,
+    #         "job_scraper.selenium.middlewares.SeleniumMiddleware": 800,
+    #     }
+    # }  
+    # settings = get_project_settings()
+    # settings.setdict(x)
+
+    # custom_settings = settings
+
+    # @override
+    # def start_requests(self):
+    #     return [
+    #         SeleniumRequest(
+    #             url=start_url,
+    #             callback=self.parse,
+    #             #wait_until=EC.element_to_be_clickable
+    #         ) for start_url in self.start_urls
+    #     ]
+
+
 
 
     # interface requirements
     
     @override 
     def searchurl_for(self, search_tag):
-        #return "https://www.google.de"
-        #return "https://www.stepstone.de/jobs/adidas"
-        return str(templ.Url(self.__general_url).param("q", search_tag))
+        #return str(templ.Url(self.__general_url).param("q", search_tag))
+        return str(templ.Url(self.__general_url).param("q", "Mercedes Benz"))
+
+
+    #TODO: proper tagging
+    @override
+    def source_tag(self, response):
+        src = response.request.url
+        if "scrapeops" in src:
+            src = unquote(src)
+        src = src[src.index("/jobs?q=")+len("/jobs?q="):]
+        if "&" in src:
+            src = src[:src.index("&")]
+
+        return src
 
 
     @override
-    def mappings(self):
-        return [ self.extract_branchen ]
+    def mappings(self, response, tag):
+        output = []
+        comp_tag = tag.lower().replace("-", "+") #.lower().replace(" ", "").replace("-", "") #not used yet since tag comes from url currently and not from a proper init
+        filters = response.xpath("//div[@role='search']").xpath(".//ul[contains(@class, 'dropdownList')]")
+
+        for x in filters:
+            if x.xpath("@id").get() == "filter-fcckey-menu": 
+                names = x.xpath(".//li//text()").getall()
+                #names = [ x[:x.rindex("(")] for x in names ]
+                
+                links = x.xpath(".//li//a//@href").getall()
+                links = [ x[x.index("&sc=")+4:x.index("&sc=")+4+33] for x in links ]
+
+        for x in zip(names, links):
+            name_tag = x[0][:x[0].rindex("(")]
+            name_count = x[0][x[0].rindex("(")+1:x[0].rindex(")")]
+
+            if comp_tag in name_tag.lower().replace(" ", "+").replace("-","+"): #flag for on/off for check?
+                output.append( {"name": name_tag, "counts": name_count, "mapping": x[1]} )
+
+
+        return output
 
 
 
 
-
+    #DEPRECATED?
     def extract_branchen(self, response):
         #buttons = response.xpath("//div[@role='search']").xpath(".//div[contains(@class, 'Filter')]//ul").xpath("(child::*)").xpath(".//button")
         #labels = buttons.xpath(".//text()")
         
-        buttons = response.request.meta["driver"].find_elements(By.XPATH, '//div[@id="app-searchBar"]//button')
-        print("buttons", buttons)
-        if buttons != None and len(buttons) > 0:
-            response.request.meta["driver"].find_elements(By.XPATH, '//div[@id="app-searchBar"]//button').click()
-        #print("yyyy", response.request.meta)
-        return {"content": "empty"}
+        # buttons = response.request.meta["driver"].find_elements(By.XPATH, '//div[@id="app-searchBar"]//button')
+        # print("buttons", buttons)
+        # if buttons != None and len(buttons) > 0:
+        #     response.request.meta["driver"].find_elements(By.XPATH, '//div[@id="app-searchBar"]//button').click()
+        # #print("yyyy", response.request.meta)
+        # return {"content": "empty"}
+        buttons = response.xpath("//div[@role='search']").xpath(".//div[contains(@class, 'Filter')]//ul").xpath("(child::*)").xpath(".//button")
+
+
+        return None
     
 
 
