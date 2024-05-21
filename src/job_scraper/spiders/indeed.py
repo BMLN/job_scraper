@@ -165,8 +165,7 @@ class Indeed_CompanyMapping_Scraper(templ.Mapping_Scraper):
     
     @override 
     def searchurl_for(self, search_tag):
-        #return str(templ.Url(self.__general_url).param("q", search_tag))
-        return str(templ.Url(self.__general_url).param("q", "Mercedes Benz"))
+        return str(templ.Url(self.__general_url).param("q", search_tag))
 
 
     #TODO: proper tagging

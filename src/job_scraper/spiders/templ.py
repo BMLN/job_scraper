@@ -66,6 +66,8 @@ class Mapping_Scraper(ABC, Spider):
             yield { "source_tag" : source_tag} | x
 
 
+    def outputs():
+        return [[ dict ]]
 
 
     #interface requirements
@@ -81,7 +83,6 @@ class Mapping_Scraper(ABC, Spider):
     @abstractmethod
     def mappings(self, response, tag):
         pass
-
 
 
 
