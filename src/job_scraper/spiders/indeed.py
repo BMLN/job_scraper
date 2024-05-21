@@ -322,4 +322,4 @@ class Indeed_JobInfo_Scraper(templ.JobInfo_Scraper):
 
     @override 
     def extract_jobnode(self, selector):
-        return selector.xpath("//div[contains(@class, 'jobsearch-JobComponent-description')]").get()
+        return selector.xpath("//div[@id='jobDescriptionText']").get()
