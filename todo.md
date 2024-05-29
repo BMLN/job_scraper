@@ -6,9 +6,9 @@
 - [ ] all value information is behind unstructured text
 - [ ] allow both company and tag search: implement with 2 different params
 - [ ] running the spiders sequentially
-- [ ] scrapy itself doesn't work with its configuration, only call modules from script
-- [ ] general webdriver initialisation
-- [ ] optimizie mappings parsing
+- [x] scrapy itself doesn't work with its configuration, only call modules from script -> look issue (SCRAPY_SETTINGS_MODULE is broken)
+- [ ] <del> general webdriver initialisation</del>         not necessary anymore
+- [x] mappings parsing
 - [ ] indeed doesnt seem to filter if not in passed companies list
 - [ ] better initial tag setting
 
