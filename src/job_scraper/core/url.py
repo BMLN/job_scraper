@@ -43,8 +43,9 @@ class Url:
     #     }
     #TODO
     
+    #TODO
     def parse(str):
-        return Url("https://www.google.de")
+        return Url(str)
         
 
     @classmethod

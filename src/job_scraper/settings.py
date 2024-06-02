@@ -101,3 +101,15 @@ DOWNLOADER_MIDDLEWARES = {
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 #TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor" demanded for sequential? -> recheck
 FEED_EXPORT_ENCODING = "utf-8"
+
+#from job_scraper.spiders.new_indeed import Indeed_JobSearch_Scraper
+#from inspect import signature
+#outs = signature(Indeed_JobSearch_Scraper.url_extractor).return_annotation
+#print(outs)
+# FEEDS = { 
+#     "test.csv" : {
+#         "format": "csv",
+#         "overwrite": "true",
+#         "item_classes": outs #[ dict ]
+#     }
+# }

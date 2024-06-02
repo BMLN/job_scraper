@@ -19,7 +19,7 @@
 
 
 
-import base_spiders
+from job_scraper.core.base_scraper import BaseScraper
 from abc import abstractmethod, ABC
 from typing import override
 
@@ -27,9 +27,9 @@ from typing import override
 
 
 #TODO: add verification?
-class JobSearchScraper(base_spiders.BaseScraper, ABC):
-    
-    def __init__(self, inputs, *args, **kwargs):
+class JobSearchScraper(BaseScraper, ABC):
+  
+    def __init__(self, inputs=[], *args, **kwargs):
         super().__init__(
             name=self.name,
             inputs=inputs, 
@@ -37,14 +37,14 @@ class JobSearchScraper(base_spiders.BaseScraper, ABC):
             *args,
             **kwargs
         )
-        
+
 
     @override
     def parse(self, response):
         yield from super().parse(response)
         
         if (next := self.nextractor(response)) != None:
-            yield response.follow(next, self.parse)
+            yield response.follow(next, callback=self.parse, meta={"source": response.meta.get("source")})
 
 
 
@@ -52,7 +52,7 @@ class JobSearchScraper(base_spiders.BaseScraper, ABC):
 
     @classmethod
     @abstractmethod
-    def url_extractor(cls) -> list[dict]:
+    def url_extractor(cls) -> [dict]:
         pass
 
     # may just implement as extractor?
@@ -68,7 +68,7 @@ class JobSearchScraper(base_spiders.BaseScraper, ABC):
 
 
 
-class JobInfoScraper(base_spiders.BaseScraper, ABC):
+class JobInfoScraper(BaseScraper, ABC):
     
     def __init__(self, inputs, *args, **kwargs):
         super().__init__(
@@ -103,21 +103,21 @@ class JobInfoScraper(base_spiders.BaseScraper, ABC):
     # Interface Requirements
 
     @abstractmethod
-    def extract_jobtitle(self, selector) -> str:
+    def extract_jobtitle(cls, selector) -> str:
         pass
 
     @abstractmethod
-    def extract_company(self, selector) -> str:
+    def extract_company(cls, selector) -> str:
         pass
 
     @abstractmethod
-    def extract_location(self, selector) -> str:
+    def extract_location(cls, selector) -> str:
         pass
 
     @abstractmethod
-    def extract_employment(self, selector) -> str:
+    def extract_employment(cls, selector) -> str:
         pass
 
     @abstractmethod
-    def extract_jobnode(self, selector) -> str:
+    def extract_jobnode(cls, selector) -> str:
         pass

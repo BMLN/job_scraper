@@ -14,13 +14,14 @@
 
 
 from typing import Iterable, override
+from inspect import signature, Signature
 
 from scrapy import Spider
 from scrapy.http import Request
 
-from url import Url
+from job_scraper.core.url import Url
 
-from itertools import chain
+
 
 #tags: ex. "Werkstudent IT", translate into url objects
 #urls: url objects
@@ -36,16 +37,13 @@ from itertools import chain
 class BaseScraper(Spider):
 
     def __init__(self, name, inputs=[], extractors=[], *args, **kwargs):
-        super(Spider, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
+        print("inp", inputs)
+        print("kwatg", kwargs)
         self.name = name
-        self.start_urls = list(chain(*BaseScraper.parse_inputs(inputs)))
+        self.start_urls = BaseScraper.parse_inputs(inputs)
         self.extractors = extractors
 
-        #self.custom_settings = {"KEY": "VALUE"}
-        from scrapy.utils.project import get_project_settings
-
-        self.settings = get_project_settings()
-        self.settings.set("KEY", "VALUE")
 
 
     #read inputs and return (start)urls
@@ -56,13 +54,13 @@ class BaseScraper(Spider):
 
         match input:
             case list():
-                output += [ BaseScraper.parse_inputs(x) for x in input ]
+                output += [ parse_inputs(x) for x in input ] ##wrong
             case Url():
                 output.append(input)           
             case str():
                 #read file
                 if input.endswith(".csv") or input.endswith(".json"):
-                    output += Url.from_file(input)
+                    output += Url.from_file(input) ##wrong
                 #url
                 else:
                     output.append(Url.parse(input))
@@ -72,58 +70,39 @@ class BaseScraper(Spider):
         return output
 
 
+    def parse_exports(self): 
+        output = []
+        
+        for x in self.extractors:
+            if (extractor_return := signature(x).return_annotation) != Signature.empty:
+                output.append({
+                    "format": "csv",
+                    "overwrite": "true",
+                    "item_classes": extractor_return
+                })
+        
+        return output
+
+
+
+
+    #scrapy interface
+
+    @override
     def parse(self, response):
         for extractor in self.extractors:
             for extracted_item in extractor(response):
                 yield response.meta.get("source") | extracted_item
         
 
-    #TODO
-    #rename to outputs or something
-    def extractor_types(self):
-        return self.extractors
-    
 
     #TODO: change to generator
     @override
     def start_requests(self) -> Iterable[Request]:
         outs = []
+        return outs
         for url in self.start_urls:
-            outs.append(Request(url=str(url), meta={"source": dict(url)}, callback=self.parse))
+            outs.append(Request(url=str(url), callback=self.parse, meta={"source": dict(url)}))
 
-        #print(outs)
         return outs
 
-
-
-
-
-
-
-
-    @classmethod
-    def update_settings(cls, settings):
-        super().update_settings(settings)
-        #print(settings.attributes.items())
-
-    # def output_feeds(self):
-    #     output = {}
-        
-    #     for key, value in self.writes.items():
-    #         output[key] = {
-    #         "format": "csv",
-    #         "overwrite": "true",
-    #         "item_classes": value
-    #     }
-
-
-
-
-
-if __name__ == "__main__":
-    from scrapy.crawler import CrawlerProcess
-    
-    process = CrawlerProcess()
-
-    process.crawl(BaseScraper, name="", inputs=["www.google.de"])
-    process.start() 
