@@ -38,8 +38,6 @@ class BaseScraper(Spider):
 
     def __init__(self, name, inputs=[], extractors=[], *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print("inp", inputs)
-        print("kwatg", kwargs)
         self.name = name
         self.start_urls = BaseScraper.parse_inputs(inputs)
         self.extractors = extractors
@@ -70,10 +68,11 @@ class BaseScraper(Spider):
         return output
 
 
-    def parse_exports(self): 
+    #callable as inst method this way, good sol?
+    def parse_exports(extractors) -> list[list]: 
         output = []
         
-        for x in self.extractors:
+        for x in extractors if not isinstance(extractors, BaseScraper) else extractors.extractors:
             if (extractor_return := signature(x).return_annotation) != Signature.empty:
                 output.append({
                     "format": "csv",
@@ -105,4 +104,3 @@ class BaseScraper(Spider):
             outs.append(Request(url=str(url), callback=self.parse, meta={"source": dict(url)}))
 
         return outs
-

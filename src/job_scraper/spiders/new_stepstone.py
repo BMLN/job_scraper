@@ -5,12 +5,13 @@ from scrapy.linkextractors import LinkExtractor
 from urllib.parse import unquote
 
 
+
 class Stepstone_JobScraper(new_templ.JobSearchScraper):
     
-    name = "stepstone_jobinfo_spider"
+    name = "newstepstone_jobsearch_spider"
     allowed_domains = ["stepstone.de"]
 
-    __extractor = scrapy.linkextractors.LinkExtractor(
+    __extractor = LinkExtractor(
         #allow = "/www\.stepstone\.de\/stellenangebote--.*/",
         allow = "/stellenangebote--", #some problems with regex, rly correct?
         #restrict_xpaths = "//div[contains(@class, 'results')]"
@@ -40,10 +41,13 @@ class Stepstone_JobScraper(new_templ.JobSearchScraper):
 
 
 
-class Stepstone_InfoScraper(new_templ.JobInfo_Scraper):
+class Stepstone_InfoScraper(new_templ.JobInfoScraper):
     
-    #interface requirements
+    name = "newstepstone_jobinfo_spider"
+    allowed_domains = ["stepstone.de"]
 
+
+    #interface requirements
     
     @override
     def extract_jobtitle(cls, selector):

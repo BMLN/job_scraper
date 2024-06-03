@@ -70,7 +70,7 @@ class JobSearchScraper(BaseScraper, ABC):
 
 class JobInfoScraper(BaseScraper, ABC):
     
-    def __init__(self, inputs, *args, **kwargs):
+    def __init__(self, inputs=[], *args, **kwargs):
         super().__init__(
             name=self.name,
             inputs=inputs, 

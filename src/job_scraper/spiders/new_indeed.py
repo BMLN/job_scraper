@@ -50,6 +50,9 @@ class Indeed_JobScraper(new_templ.JobSearchScraper):
 
 class Indeed_InfoScraper(new_templ.JobInfoScraper):
 
+    name = "newindeed_jobinfo_spider"
+    allowed_domains = ["de.indeed.com"]
+
     #interface requirements
     
     @override
