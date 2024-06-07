@@ -99,7 +99,7 @@ class BaseScraper(Spider):
     @override
     def start_requests(self) -> Iterable[Request]:
         outs = []
-        return outs
+
         for url in self.start_urls:
             outs.append(Request(url=str(url), callback=self.parse, meta={"source": dict(url)}))
 
