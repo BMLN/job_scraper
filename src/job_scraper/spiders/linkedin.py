@@ -12,9 +12,7 @@ class LinkedIn_JobScraper(new_templ.JobSearchScraper):
     allowed_domains = ["de.linkedin.com"]
 
     __extractor = LinkExtractor(
-        #allow = "https://de.indeed.com/rc/clk?", #needed for whatever reason hmm
         restrict_xpaths = "//main[@id='main-content']//ul//li//div[contains(@class, 'job-search')]//a[contains(@class, 'full-link')]",
-        #restrict_text = "student" #filter is gonna be applied on the dataset separately
     )
 
 
