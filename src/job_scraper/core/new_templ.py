@@ -52,13 +52,13 @@ class JobSearchScraper(BaseScraper, ABC):
 
     @classmethod
     @abstractmethod
-    def url_extractor(cls) -> [dict]:
+    def url_extractor(cls, response) -> [dict]:
         pass
 
     # may just implement as extractor?
     @classmethod
     @abstractmethod
-    def nextractor(cls) -> str:
+    def nextractor(cls, response) -> str:
         pass
 
 
@@ -85,16 +85,14 @@ class JobInfoScraper(BaseScraper, ABC):
     @classmethod
     def jobinfo_extractor(cls, response) -> list[dict]:
         return [{
-            "Name": cls.extract_company(response),
-            "Jobbezeichnung": cls.extract_jobtitle(response),
-            #"Tätigkeitsbereich": None,
-            #"Aufgaben": self.extract_tasks(response),
-            #"Qualifikationen": self.extract_qualifications(response),
-            #"etc": self.extract_etc(response),
-            "Standort": cls.extract_location(response),
-            "Anstellungsart": cls.extract_employment(response),
-            "job_node" : cls.extract_jobnode(response)
-            #"raw_text": self.extract_rawtext(response)
+            "title": cls.extract_jobtitle(response),
+            "content": cls.extract_content(response), 
+            "company": cls.extract_company(response),
+            "field" : cls.extract_field(response),
+            "industry" : cls.extract_industry(response),
+            "employment": cls.extract_employment(response),
+            "location" : cls.extract_location(response),
+            "posted": cls.extract_posting(response)
         }]
 
     
@@ -107,11 +105,19 @@ class JobInfoScraper(BaseScraper, ABC):
         pass
 
     @abstractmethod
+    def extract_content(cls, selector) -> str:
+        pass
+
+    @abstractmethod
     def extract_company(cls, selector) -> str:
         pass
 
     @abstractmethod
-    def extract_location(cls, selector) -> str:
+    def extract_field(cls, selector) -> str:
+        pass
+
+    @abstractmethod
+    def extract_industry(cls, selector) -> str:
         pass
 
     @abstractmethod
@@ -119,5 +125,9 @@ class JobInfoScraper(BaseScraper, ABC):
         pass
 
     @abstractmethod
-    def extract_jobnode(cls, selector) -> str:
+    def extract_location(cls, selector) -> str:
+        pass
+
+    @abstractmethod
+    def extract_posting(cls, selector) -> str:
         pass

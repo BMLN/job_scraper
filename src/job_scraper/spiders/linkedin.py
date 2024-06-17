@@ -47,50 +47,58 @@ class LinkedIn_InfoScraper(new_templ.JobInfoScraper):
 
     #interface requirements
     
+    @classmethod
     @override
     def extract_jobtitle(cls, selector) -> str:
         output = selector.xpath("//section[contains(@class, 'container')]//div[contains(@class, 'info-container')]//h1//text()").get()
         
         return output
-
+    
+    @classmethod
     @override
     def extract_content(cls, selector) -> str:
         return selector.xpath("//div[contains(@class, 'job-posting')]//div[contains(@class, 'core-section')]//div[contains(@class, 'description__text')]//div").get()
-
+    
+    @classmethod
     @override
     def extract_company(cls, selector) -> str:
         output = selector.xpath("//section[contains(@class, 'container')]//div[contains(@class, 'info-container')]//h4//a[contains(@class, 'org-name')]//text()").get()
 
         return output
-
+    
+    @classmethod
     @override
     def extract_field(cls, selector) -> str:
         output = selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li//span//text()")
 
         if len(output) > 0:
             return output[2]
-
+    
+    @classmethod
     @override
     def extract_industry(cls, selector) -> str:
         output = selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li//span//text()")
 
         if len(output) > 0:
             return output[3]
-
+    
+    @classmethod
     @override
     def extract_employment(cls, selector) -> str:
         output = selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li//span//text()")
 
         if len(output) > 0:
             return output[0]
-
+    
+    @classmethod
     @override
     def extract_location(cls, selector) -> str:
         output = selector.xpath("//section[contains(@class, 'container')]//div[contains(@class, 'info-container')]//h4//span")
 
         if len(output) > 0:
             return output[1].xpath(".//text()").get()
-
+    
+    @classmethod
     @override
     def extract_posting(cls, selector) -> str:
         output = selector.xpath("//section[contains(@class, 'container')]//div[contains(@class, 'info-container')]//span[contains(@class, 'posted-time-ago')]//text()")

@@ -22,15 +22,17 @@ class GetInIT_JobSearch_Scraper(new_templ.JobSearchScraper):
 
     # interface requirements
 
+    @classmethod  
     @override
-    def url_extractor(self, selector):
+    def url_extractor(cls, selector):
         return [ {"url_text": url.text, "url" : url.url} for url in cls.__extractor.extract_links(response) ]
 
 
 
     #TODO: javascript interaction
+    @classmethod  
     @override
-    def extract_nextpage(self, response):
+    def extract_nextpage(cls, response):
         return None
 
 
@@ -41,7 +43,7 @@ class GetInIT_JobSearch_Scraper(new_templ.JobSearchScraper):
 
 
 
-class GetInIT_JobInfo_Scraper(templ.JobInfo_Scraper):
+class GetInIT_JobInfo_Scraper(new_templ.JobInfoScraper):
     
     name = "getinit_jobinfo_spider"
     allowed_domains = ["get-in-it.de"]
@@ -51,19 +53,22 @@ class GetInIT_JobInfo_Scraper(templ.JobInfo_Scraper):
 
     # Interface Implementations
 
-
+    @classmethod
     @override
-    def extract_jobtitle(self, selector):
+    def extract_jobtitle(cls, selector):
         return selector.xpath("//h1[contains(@class, 'JobHeaderRegular_jobTitle')]//text()").get()
-                 
+   
+    @classmethod              
     @override
     def extract_content(cls, selector) -> str:
         return selector.xpath("(//div[@class='container']//div[contains(@class, 'JobDescription')]//section)").getall()
-        
+   
+    @classmethod     
     @override
     def extract_company(cls, selector) -> str:
         return selector.xpath("//p[contains(@class, 'JobHeaderRegular_companyTitle')]//text()").get()
 
+    @classmethod
     @override
     def extract_field(cls, selector) -> str:
         jobinfos = selector.xpath("//div[contains(@class, 'JobInfo')]//div[contains(@class, 'JobInfo') and contains(@class, 'row')]")
@@ -71,20 +76,23 @@ class GetInIT_JobInfo_Scraper(templ.JobInfo_Scraper):
         if len(jobinfos) > 0:
             return jobinfos[0].getall()[1:]
 
+    @classmethod
     @override
     def extract_industry(cls, selector) -> str:
         return None
 
+    @classmethod
     @override
     def extract_employment(cls, selector) -> str:
         return None
 
+    @classmethod
     @override
     def extract_location(cls, selector) -> str:
         return selector.xpath("//div[contains(@class, 'JobHeaderRegular_jobLocation')]//text()").get()
 
+    @classmethod
     @override
     def extract_posting(cls, selector) -> str:
         return None
-
 

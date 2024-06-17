@@ -20,7 +20,7 @@ from scrapy import Spider
 from scrapy.http import Request
 
 from job_scraper.core.url import Url
-
+from datetime import date
 
 
 #tags: ex. "Werkstudent IT", translate into url objects
@@ -91,7 +91,7 @@ class BaseScraper(Spider):
     def parse(self, response):
         for extractor in self.extractors:
             for extracted_item in extractor(response):
-                yield response.meta.get("source") | extracted_item
+                yield response.meta.get("source") | extracted_item | {"date": date.today()} 
         
 
 

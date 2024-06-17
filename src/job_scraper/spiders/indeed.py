@@ -8,7 +8,7 @@ from urllib.parse import unquote
 
 class Indeed_JobScraper(new_templ.JobSearchScraper):
     
-    name = "newindeed_jobsearch_spider"
+    name = "indeed_jobsearch_spider"
     allowed_domains = ["de.indeed.com"]
 
     __extractor = LinkExtractor(
@@ -50,7 +50,7 @@ class Indeed_JobScraper(new_templ.JobSearchScraper):
 
 class Indeed_InfoScraper(new_templ.JobInfoScraper):
 
-    name = "newindeed_jobinfo_spider"
+    name = "indeed_jobinfo_spider"
     allowed_domains = ["de.indeed.com"]
 
 

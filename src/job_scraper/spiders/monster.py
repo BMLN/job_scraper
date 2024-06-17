@@ -49,25 +49,30 @@ class Monster_InfoScraper(new_templ.JobInfoScraper):
 
 
     #interface requirements
-    
+        
+    @classmethod
     @override
     def extract_jobtitle(cls, selector) -> str:
         return selector.xpath("//div[@id='job-view-header']//h2[@data-testid='jobTitle']//text()").get()
         
+    @classmethod    
     @override
     def extract_content(cls, selector) -> str:
         return selector.xpath("//div[contains(@class, 'DescriptionContainer')]//div//div").get()
-        
+         
+    @classmethod   
     @override
     def extract_company(cls, selector) -> str:
         output = selector.xpath("//div[@id='job-view-header']//li[@data-testid='company']//text()").get()
 
         return output
-
+    
+    @classmethod
     @override
     def extract_field(cls, selector) -> str:
         return None
-
+    
+    @classmethod
     @override
     def extract_industry(cls, selector) -> str:
         output = selector.xpath("//div[contains(@class, 'numbers-and-facts')]//table//tr")
@@ -76,7 +81,8 @@ class Monster_InfoScraper(new_templ.JobInfoScraper):
             output = output[2].xpath(".//td//text()")
             if output:
                 return output[1]
-
+    
+    @classmethod
     @override
     def extract_employment(cls, selector) -> str:
         output = selector.xpath("//div[contains(@class, 'numbers-and-facts')]//table//tr")
@@ -85,11 +91,13 @@ class Monster_InfoScraper(new_templ.JobInfoScraper):
             output = output[1].xpath(".//td//text()")
             if output:
                 return output[1]
-
+    
+    @classmethod
     @override
     def extract_location(cls, selector) -> str:
         return selector.xpath("//div[@id='job-view-header']//li[@data-testid='jobDetailLocation']//text()")
-
+    
+    @classmethod
     @override
     def extract_posting(cls, selector) -> str:
         return selector.xpath("//div[@id='job-view-header']//li[@data-testid='jobDetailDataRecency']//text()")
