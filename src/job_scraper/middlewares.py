@@ -4,10 +4,15 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.http import Response, HtmlResponse, TextResponse
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
 
+
+from cloudscraper import create_scraper
+import queue
+import pandas as pd
 
 class JobScraperSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
@@ -114,3 +119,46 @@ class JobScraperDownloaderMiddleware:
     @classmethod
     def proxy_str(cls, proxy_host, proxy_auth):
         return "http://" + str(proxy_auth) + "@" + str(proxy_host)
+
+
+def parse_inputs(input):
+        output = []
+
+        match input:
+            case list():
+                output += [ parse_inputs(x) for x in input ]            
+            case str():
+                #read file
+                if input.endswith(".csv"):
+                    output += pd.read_csv(input).apply(lambda x: "{}:{}".format(x["ip"], x["port"]), axis=1).values.tolist()
+                elif input.endswith(".json"):
+                    output += pd.read_json(input).apply(lambda x: "{}:{}".format(x["ip"], x["port"]), axis=1).values.tolist()
+                else:
+                    output.append(input)
+            case _:
+                raise TypeError("unrecognized input type")
+
+        return output
+
+
+class CloudFlareMiddleware:
+    def __init__(self, settings={}):
+        self.scraper = create_scraper()
+        #self.proxy_list = queue.Queue()
+        #for x in parse_inputs(settings.get("PROXY_INPUTS")): self.proxy_list.put(x)
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+
+
+
+
+    def process_request(self, request, spider):
+        url = request.url
+        proxies = {} #cloudscraper provides proxylist
+                
+        resp = self.scraper.get(url=url, proxies=proxies)
+        resp = HtmlResponse(resp.url, headers=resp.headers, body=resp.content, request=request)
+
+        return resp

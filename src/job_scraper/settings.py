@@ -16,9 +16,9 @@ NEWSPIDER_MODULE = "job_scraper.spiders"
 from os import environ
 PROXY_HOST = environ.get("PROXY_HOST")
 PROXY_AUTH = environ.get("PROXY_AUTH")
-
+PROXY_INPUTS = environ.get("PROXY_INPUTS")
+COMPRESSION_ENABLED = False
 SCRAPEOPS_API_KEY = environ.get("SCRAPEOPS_API_KEY")
-
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "job_scraper (+http://www.yourdomain.com)"
@@ -59,9 +59,10 @@ CONCURRENT_REQUESTS_PER_IP = 1
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     #"job_scraper.middlewares.JobScraperDownloaderMiddleware": 350,
-    "scrapeops_scrapy_proxy_sdk.scrapeops_scrapy_proxy_sdk.ScrapeOpsScrapyProxySdk" : 725
+    #"scrapeops_scrapy_proxy_sdk.scrapeops_scrapy_proxy_sdk.ScrapeOpsScrapyProxySdk" : 725
     #"job_scraper.middlewares.JobScraperDownloaderMiddleware": 543,
     #"scrapy_cloudflare_middleware.middlewares.CloudFlareMiddleware", 560,
+    "job_scraper.middlewares.CloudFlareMiddleware" : 100
 }
 
 # Enable or disable extensions
