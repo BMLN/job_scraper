@@ -47,21 +47,21 @@ class BaseScraper(Spider):
     #read inputs and return (start)urls
     #either Url or string or file or lists of eithers
     #TODO: url checking?
-    def parse_inputs(input):
+    def parse_inputs(inp):
         output = []
 
-        match input:
+        match inp:
             case list():
-                output += [ parse_inputs(x) for x in input ] ##wrong
+                output += [ parse_inputs(x) for x in inp ] ##wrong
             case Url():
-                output.append(input)           
+                output.append(inp)           
             case str():
                 #read file
-                if input.endswith(".csv") or input.endswith(".json"):
-                    output += Url.from_file(input) ##wrong
+                if inp.endswith(".csv") or inp.endswith(".json"):
+                    output += Url.from_file(inp) 
                 #url
                 else:
-                    output.append(Url.parse(input))
+                    output.append(Url.parse(inp))
             case _:
                 raise TypeError("unrecognized input type")
 
@@ -87,8 +87,10 @@ class BaseScraper(Spider):
 
     #scrapy interface
 
-    @override
+    @override #yes?
     def parse(self, response):
+    #new is going to be:
+    #def parse(self, response, source={})
         for extractor in self.extractors:
             for extracted_item in extractor(response):
                 yield response.meta.get("source") | extracted_item | {"date": date.today()} 
@@ -102,5 +104,7 @@ class BaseScraper(Spider):
 
         for url in self.start_urls:
             outs.append(Request(url=str(url), callback=self.parse, meta={"source": dict(url)}))
+            #new is going to be:
+            #outs.append(Request(url=str(url), callback=self.parse, cb_kwargs={"source": dict(url)}))
 
         return outs

@@ -48,7 +48,7 @@ class Url:
         return Url(str)
         
 
-    @classmethod
+
     def from_file(path_to_file):
         output = pd.DataFrame()
 
@@ -59,15 +59,18 @@ class Url:
         else:
             raise Exception("unrecognized input type")
 
-        if ("url" in data ) == False:
-            data["url"] = ""
+        #TODO
+        #if ("url" in data ) == False:
+        #    data["url"] = ""
             
-        #remove None?#
+        # #remove None?#
 
-        output["url"] = output["url"].apply(lambda x: Url(x))
+        # output["url"] = output["url"].apply(lambda x: Url(x))
         
-        output["keys"] = data.apply(lambda x: x in Url(x).keys(),  axis=1) 
-        #data = [ x for x in data.to_dict("records") ]
+        # output["keys"] = data.apply(lambda x: x in Url(x).keys(),  axis=1) 
+        # #data = [ x for x in data.to_dict("records") ]
+        #FOLLOWING OMNLY FOR FAST USABILITY
+        data = [ Url(x) for x in data["url"].values.tolist() ]
 
         return data
 

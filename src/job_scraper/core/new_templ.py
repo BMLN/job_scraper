@@ -28,7 +28,7 @@ from typing import override
 
 #TODO: add verification?
 class JobSearchScraper(BaseScraper, ABC):
-  
+
     def __init__(self, inputs=[], *args, **kwargs):
         super().__init__(
             name=self.name,
@@ -95,8 +95,8 @@ class JobInfoScraper(BaseScraper, ABC):
             "posted": cls.extract_posting(response)
         }]
 
-    
-    
+
+
 
     # Interface Requirements
 
