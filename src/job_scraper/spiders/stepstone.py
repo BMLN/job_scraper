@@ -33,6 +33,7 @@ class Stepstone_JobScraper(new_templ.JobSearchScraper):
     def nextractor(cls, response) -> str:
         nxt = selector.xpath("//nav[contains(@aria-label, 'pagination')]//a[@href]/@href").extract()
         
+        return None #TODO: for testing
         if len(nxt) > 1:
             return nxt[-1]
         else:

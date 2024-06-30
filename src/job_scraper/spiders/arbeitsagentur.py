@@ -8,7 +8,7 @@ import re
 class Arbeitsagentur_JobSearch_Scraper(new_templ.JobSearchScraper):
 
     name = "arbeitsagentur_jobsearch_spider"
-    allowed_domains = ["arbeitsagentur.de"]
+    #allowed_domains = ["arbeitsagentur.de"]
 
     __general_search_url = "https://www.arbeitsagentur.de/jobsuche/suche"
     __extractor = scrapy.linkextractors.LinkExtractor(
@@ -22,7 +22,7 @@ class Arbeitsagentur_JobSearch_Scraper(new_templ.JobSearchScraper):
 
     @classmethod  
     @override
-    def url_extractor(cls, selector) -> list[dict]:
+    def url_extractor(cls, response) -> list[dict]:
         return [ {"url_text": url.text, "url" : url.url} for url in cls.__extractor.extract_links(response) ]
 
 
@@ -30,12 +30,23 @@ class Arbeitsagentur_JobSearch_Scraper(new_templ.JobSearchScraper):
     #TODO: javascript interaction
     @classmethod  
     @override
-    def extract_nextpage(cls, response):
+    def nextractor(cls, response):
         return None
 
+    @override
+    def parse(self, response):
+        #print("rest", response)
+        #print("content", response.body)
+        r = r"https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobs?angebotsart=34&was=Mercedes%20Benz%20Group&berufsfeld=Informatik&arbeitgeber=Mercedes-Benz%20Group%20AG&page=2&size=25&pav=false&facetten=false"
 
+        s = scrapy.http.Request(r, callback=self.api )
+        print(response.headers)
+        yield s
 
-    
+    def api(cls, response):
+        print("rest", response)
+        print("content", response.body)
+
 
 class Arbeitsagentur_JobInfo_Scraper(new_templ.JobInfoScraper):
     

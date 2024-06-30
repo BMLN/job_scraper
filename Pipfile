@@ -13,6 +13,7 @@ selenium = "*"
 webdriver-manager = "*"
 pandas = "*"
 scrapeops-scrapy-proxy-sdk = "*"
+cloudscraper = "*"
 
 [dev-packages]
 
@@ -25,3 +26,10 @@ crawl_all = "pipenv run python src/main.py --getinit_urls --indeed_urls --stepst
 test = "pipenv run python src/test.py"
 indeed = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/indeed_spider2.py -O ./../indeed.csv -a companies=$@ ' BASH_PARAM_TOMAKEITWORK"
 stepstone_deprc = "bash -c 'cd src && pipenv run scrapy runspider job_scraper/spiders/stepstone_spider.py -O ./../stepstone.csv -a companies=$@' SAMEPARAMTHATGETSCONSUMED"
+linkedin = "bash -c 'cd src && pipenv run scrapy crawl linkedin_jobsearch_spider -a inputs=file:///Users/lorandbanki/Desktop/linkedinsearch.html'"
+arbeitsagentur = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobsearch_spider -a inputs=https://www.arbeitsagentur.de/jobsuche/suche?angebotsart=34&was=Mercedes%20Benz%20Group&berufsfeld=Informatik&arbeitgeber=Mercedes-Benz%20Group%20AG&id=13151-1217700-1-S'"
+monster = "bash -c 'cd src && pipenv run scrapy crawl monster_jobsearch_spider -a inputs=https://www.google.de'"
+indeed2 = "bash -c 'cd src && pipenv run scrapy crawl newindeed_jobinfo_spider -a inputs=file:///Users/lorandbanki/Desktop/Indeed_Job.html'"
+indeed_jobs = "bash -c 'cd src && pipenv run scrapy crawl indeed_jobsearch_spider -O ../output/indeed_jobs.csv:csv -a inputs=https://de.indeed.com/jobs?q=Werkstudent+IT&l=Deutschland '"
+indeed_info = "bash -c 'cd src && pipenv run scrapy crawl indeed_jobinfo_spider -O ../output/indeed_infos.csv:csv -a inputs=../output/indeed_jobs.csv'"
+stepstone_jobs = "bash -c 'cd src && pipenv run scrapy crawl stepstone_jobinfo_spider -a inputs=https://www.stepstone.de/jobs/werkstudent-in-it?q=Werkstudent%2fin+IT -O ../output/stepstone_jobs.csv:csv'"

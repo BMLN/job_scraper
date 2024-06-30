@@ -5,6 +5,7 @@
 
 from scrapy import signals
 from scrapy.http import Response, HtmlResponse, TextResponse
+from scrapy.spidermiddlewares.httperror import HttpErrorMiddleware
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -141,6 +142,8 @@ def parse_inputs(input):
         return output
 
 
+
+#TODO: passing a session
 class CloudFlareMiddleware:
     def __init__(self, settings={}):
         self.scraper = create_scraper()
@@ -155,10 +158,35 @@ class CloudFlareMiddleware:
 
 
     def process_request(self, request, spider):
+        output = HtmlResponse(request.url)
         url = request.url
         proxies = {} #cloudscraper provides proxylist
                 
-        resp = self.scraper.get(url=url, proxies=proxies)
-        resp = HtmlResponse(resp.url, headers=resp.headers, body=resp.content, request=request)
+        print("requesting", request.url)
+        with self.scraper.get(url=url, proxies=proxies, timeout=60*2) as resp:
+            for x in range(50000000): #super cool very gud delay func
+                pass
+            output = HtmlResponse(
+                resp.url, 
+                status=resp.status_code, 
+                headers=resp.headers, 
+                #body=resp.content, #problem?
+                body=str(resp.content),
+                encoding="utf-8",
+                request=request
+            )
 
-        return resp
+            if """<span id="challenge-error-text">Enable JavaScript and cookies to continue</span>""" in str(output.body):
+                print("didnt solve challenge")
+                output.status = 500
+        
+            if """<h1 data-translate="block_headline">Sorry, you have been blocked</h1>""" in str(output.body):
+                print("blocked on used ip")
+                output.status = 503
+
+        #print(resp.content)
+        return output
+
+# class ErrorMiddleware(HttpErrorMiddleware):
+    
+#     @override

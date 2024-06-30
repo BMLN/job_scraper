@@ -12,8 +12,9 @@ class Indeed_JobScraper(new_templ.JobSearchScraper):
     allowed_domains = ["de.indeed.com"]
 
     __extractor = LinkExtractor(
-        allow = "https://de.indeed.com/rc/clk?", #needed for whatever reason hmm
-        restrict_xpaths = "//div[@id='mosaic-jobResults']//ul//td[contains(@class, 'resultContent')]",
+        #allow = "https://de.indeed.com/rc/clk?", "https://de.indeed.com/pagead/clk?", #needed for whatever reason hmm
+        allow = r"(de.indeed.com\/(rc|pagead)\/(clk\?))",
+        restrict_xpaths = "//div[@id='mosaic-jobResults']//ul//td[contains(@class, 'resultContent')]//h2[contains(@class, 'jobTitle')]//a",
         #restrict_text = "student" #filter is gonna be applied on the dataset separately
     )
 
@@ -31,12 +32,14 @@ class Indeed_JobScraper(new_templ.JobSearchScraper):
         return [ {"url_text": url.text, "url" : url.url} for url in cls.__extractor.extract_links(response) ]
 
 
+    #TODO: fix: problems if  less <5?
     @classmethod
     @override
     def nextractor(cls, response) -> str:
-        nxt = response.xpath("//nav[@role='navigation']//li//a/@href").getall()
-        return None #TODO
-        if len(nxt) > 1:
+        nxt = response.xpath("//nav[@role='navigation']//li//a//@href").getall()
+
+        #return None #TODO
+        if len(nxt) > 0:
             if nxt[-1] != "#":
                 url = str(nxt[-1])
 
@@ -96,7 +99,7 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
     @override
     def extract_employment(cls, selector) -> str:
         output = selector.xpath("//div[@id='salaryInfoAndJobType']//text()").getall()
-        print(output)
+        #print(output)
 
         output = [ x for x in output if ("css" in x ) == False] #why necessary ? :o only running spider demanding it, fine with html otherwise
 

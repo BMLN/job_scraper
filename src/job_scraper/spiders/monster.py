@@ -10,7 +10,7 @@ from urllib.parse import unquote
 class Monster_JobScraper(new_templ.JobSearchScraper):
     
     name = "monster_jobsearch_spider"
-    allowed_domains = ["monster.de"]
+    #allowed_domains = ["monster.de"]
 
     __extractor = LinkExtractor(
         restrict_xpaths = "//div[@id='JobCardGrid']//a[@data-testid='jobTitle']",
