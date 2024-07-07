@@ -145,10 +145,13 @@ def parse_inputs(input):
 
 #TODO: passing a session
 class CloudFlareMiddleware:
-    def __init__(self, settings={}):
-        self.scraper = create_scraper()
-        #self.proxy_list = queue.Queue()
-        #for x in parse_inputs(settings.get("PROXY_INPUTS")): self.proxy_list.put(x)
+    
+    scraper = create_scraper()
+
+    #def __init__(self, settings={}):
+    #    self.scraper = create_scraper(debug=False)
+    #    #self.proxy_list = queue.Queue()
+    #    #for x in parse_inputs(settings.get("PROXY_INPUTS")): self.proxy_list.put(x)
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -162,10 +165,11 @@ class CloudFlareMiddleware:
         url = request.url
         proxies = {} #cloudscraper provides proxylist
                 
-        print("requesting", request.url)
-        with self.scraper.get(url=url, proxies=proxies, timeout=60*2) as resp:
-            for x in range(50000000): #super cool very gud delay func
+        #print("requesting", request.url)
+        for x in range(100000000): #super cool very gud delay func
                 pass
+
+        with self.scraper.get(url=url, proxies=proxies, timeout=60*2) as resp:
             output = HtmlResponse(
                 resp.url, 
                 status=resp.status_code, 

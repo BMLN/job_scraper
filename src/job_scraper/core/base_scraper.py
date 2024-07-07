@@ -93,8 +93,7 @@ class BaseScraper(Spider):
     #def parse(self, response, source={})
         for extractor in self.extractors:
             for extracted_item in extractor(response):
-                yield response.meta.get("source") | extracted_item | {"date": date.today()} 
-        
+                yield response.meta.get("source") | {"url": response.request.url} |  extracted_item | {"date": date.today()} 
 
 
     #TODO: change to generator
