@@ -4,6 +4,7 @@ from typing import override
 from scrapy.linkextractors import LinkExtractor
 from urllib.parse import unquote
 
+import json
 
 
 class Indeed_JobScraper(new_templ.JobSearchScraper):
@@ -58,9 +59,18 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
 
 
 
-    #interface requirements
-    
-
+    # interface requirements
+    #
+    # extracts: {
+    #     jobtitle,
+    #     content,
+    #     company,
+    #     None,
+    #     None,
+    #     employment,
+    #     location,
+    #     posting
+    # }
 
 
 
@@ -98,7 +108,7 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
     @classmethod       
     @override
     def extract_employment(cls, selector) -> str:
-        output = selector.xpath("//div[@id='salaryInfoAndJobType']//text()").getall()
+        output = selector.xpath("//div[@id='jobDetailsSection']//div[@aria-label='Anstellungsart']//li//text()").getall()
         #print(output)
 
         output = [ x for x in output if ("css" in x ) == False] #why necessary ? :o only running spider demanding it, fine with html otherwise
@@ -111,10 +121,16 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
     @classmethod       
     @override
     def extract_location(cls, selector) -> str:
-        return selector.xpath("//div[@class='jobsearch-BodyContainer']//div[@id='jobLocationText']//text()").get()
+        return selector.xpath("//div[@id='jobLocationWrapper']//div[@id='jobLocationText']//text()").get()
 
     @classmethod       
     @override
-    def extract_posting(cls, selector) -> str:
-        return None
+    def extract_posting(cls, selector) -> str:        
+        try:
+            job_data = selector.xpath("//script[@type='application/ld+json']//text()").get()
 
+            output = json.loads(repr(job_data)[1:-1]).get("datePosted")
+        except:
+            output = None
+        
+        return output

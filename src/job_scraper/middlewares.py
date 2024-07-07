@@ -144,6 +144,7 @@ def parse_inputs(input):
 
 
 #TODO: passing a session
+#TODO: pass delay/etc from settings.py
 class CloudFlareMiddleware:
     
     scraper = create_scraper()
@@ -153,9 +154,9 @@ class CloudFlareMiddleware:
     #    #self.proxy_list = queue.Queue()
     #    #for x in parse_inputs(settings.get("PROXY_INPUTS")): self.proxy_list.put(x)
 
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(crawler.settings)
+    #@classmethod
+    #def from_crawler(cls, crawler):
+    #    return cls(crawler.settings)
 
 
 
