@@ -4,7 +4,7 @@ from typing import override
 from scrapy.linkextractors import LinkExtractor
 from urllib.parse import unquote
 
-import json
+import re
 
 
 class Indeed_JobScraper(new_templ.JobSearchScraper):
@@ -108,13 +108,13 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
     @classmethod       
     @override
     def extract_employment(cls, selector) -> str:
-        output = selector.xpath("//div[@id='jobDetailsSection']//div[@aria-label='Anstellungsart']//li//text()").getall()
+        output = selector.xpath("//div[@id='jobDetailsSection']//div[@aria-label='Anstellungsart']//li//div/text()").getall()
         #print(output)
 
-        output = [ x for x in output if ("css" in x ) == False] #why necessary ? :o only running spider demanding it, fine with html otherwise
+        #output = [ x for x in output if ("css" in x ) == False] #why necessary ? :o only running spider demanding it, fine with html otherwise
 
-        if len(output) > 0:
-            output = output[0]
+        #if len(output) > 0:
+        #    output = output[0]
 
         return output 
 
@@ -125,12 +125,12 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
 
     @classmethod       
     @override
-    def extract_posting(cls, selector) -> str:        
-        try:
-            job_data = selector.xpath("//script[@type='application/ld+json']//text()").get()
+    def extract_posting(cls, selector) -> str: 
+        output = None
+        
+        job_data = selector.xpath("//script[@type='application/ld+json']//text()").get()
+        post_data = re.search(r"""(?<=\"datePosted\":\")[^\"]*""", job_data)
 
-            output = json.loads(repr(job_data)[1:-1]).get("datePosted")
-        except:
-            output = None
+        if post_data: output = post_data.group()
         
         return output
