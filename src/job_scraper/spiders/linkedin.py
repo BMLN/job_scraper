@@ -91,7 +91,6 @@ class LinkedIn_InfoScraper(new_templ.JobInfoScraper):
     @classmethod
     @override
     def extract_content(cls, selector) -> str:
-        return None
         return selector.xpath("//div[contains(@class, 'job-posting')]//div[contains(@class, 'core-section')]//div[contains(@class, 'description__text')]//div").get()
     
     @classmethod
@@ -104,26 +103,21 @@ class LinkedIn_InfoScraper(new_templ.JobInfoScraper):
     @classmethod
     @override
     def extract_field(cls, selector) -> str:
-        output = selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li//span//text()")
+        return selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li[h3[text()[contains(.," + "'Tätigkeitsbereich'" + ")]]]//span//text()").get()
 
-        if len(output) > 0:
-            return output[2].get()
+        
     
     @classmethod
     @override
     def extract_industry(cls, selector) -> str:
-        output = selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li//span//text()")
+        return selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li[h3[text()[contains(.," + "'Branchen'" + ")]]]//span//text()").get()
 
-        if len(output) > 0:
-            return output[3].get()
     
     @classmethod
     @override
     def extract_employment(cls, selector) -> str:
-        output = selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li//span//text()")
+        return selector.xpath("//ul[contains(@class, 'job-criteria-list')]//li[h3[text()[contains(.," + "'Beschäftigungsverhältnis'" + ")]]]//span//text()").get()
 
-        if len(output) > 0:
-            return output[1].get()
     
     @classmethod
     @override
