@@ -304,9 +304,11 @@ class CloudFlareMiddleware2:
         @classmethod
         def to_req_params(cls, request):
             PARAMS = ["method", "url", "params", "data", "json", "headers", "cookies", "files", "auth", "timeout", "allow_redirects", "proxies", "verify", "stream", "cert"]
-            PARAMS.remove("headers")
-            return { key : value for key, value in { key if key[0] != "_" else key[1:] : value for key, value in request.__dict__.items() }.items() if key in PARAMS }
 
+            output =  { key : value for key, value in { key if key[0] != "_" else key[1:] : value for key, value in request.__dict__.items() }.items() if key in PARAMS }
+            output["headers"] = dict(output["headers"].to_unicode_dict())
+
+            return output
 
         def send(self, *args, **kwargs):
             for x in range(400000000): #super cool very gud delay func
