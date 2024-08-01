@@ -22,7 +22,7 @@ class Monster_JobScraper(new_templ.JobSearchScraper):
         "accept-language": "de-DE,de;q=0.9",
         "content-type": "application/json; charset=UTF-8",
         "origin": "https://www.monster.de",
-        "referer": "https://www.monster.de/jobs/suche?q=adidas",
+        "referer": "https://www.monster.de/jobs/suche?q=Werkstudent+IT",
     }
     API_PARAMS = {"apikey":"AE50QWejwK4J73X1y1uNqpWRr2PmKB3S"}
     API_JSON = {
@@ -67,7 +67,7 @@ class Monster_JobScraper(new_templ.JobSearchScraper):
         __positions = None
         __fingerprintId = None
 
-        output["jobQuery"]["query"] = "adidas"
+        output["jobQuery"]["query"] = "Werkstudent IT"
         output["fingerprintId"] = "z41ad53fa720dc7ca6cb4f6e4f2b8f658"
 
         #output[""]
@@ -103,12 +103,13 @@ class Monster_JobScraper(new_templ.JobSearchScraper):
 
     @classmethod
     @override
-    def nextractor(cls, response) -> str:
-        api_json = response.json().get("jobRequest")
+    def nextractor(cls, response) -> str: #check simply if json is empty
+        search_results = response.json().get("jobResults")
+        search_request = response.json().get("jobRequest")
         
-        if api_json:
-            api_json["offset"] = api_json.get("offset", 0) + cls.API_PAGESIZE
-            api_json = json.dumps(api_json)
+        if search_results and search_request:
+            search_request["offset"] = search_request.get("offset", 0) + cls.API_PAGESIZE
+            search_request = json.dumps(search_request)
 
         return api_json
 
