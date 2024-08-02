@@ -1,8 +1,8 @@
-from job_scraper.core import new_templ
+from job_scraper.core import new_templ, url
 import scrapy
 from typing import override, Iterable
 
-
+from urllib.parse import urlencode, parse_qsl, parse_qs, urlparse, urlunparse
 
 
 
@@ -18,27 +18,82 @@ class GetInIT_JobSearch_Scraper(new_templ.JobSearchScraper):
         #restrict_text = "student"
     )
 
+    API_BASE = "https://www.get-in-it.de/api/v2/open/job/search"
+    API_HEADERS = {
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "de-DE,de;q=0.9",
+        "content-type": "application/json; charset=UTF-8",
+        "x-requested-with": "XMLHttpRequest",
+    }
 
+
+    @classmethod
+    def __parse_to_api_params(cls, url):
+        params = parse_qs(urlparse(url).query)
+        params["filter[thematic_priority][]"] = [ int(x) for x in params.pop("thematicPriority", []) ]
+
+        return params
+
+        
 
     # interface requirements
 
     @classmethod  
     @override
     def url_extractor(cls, selector):
-        return [ {"url_text": url.text, "url" : url.url} for url in cls.__extractor.extract_links(response) ]
+        search_results = selector.json().get("items", {}).get("results")
+        
+        return [ { "url_text": job.get("title"), "url" : f"{"https://www.get-in-it.de"}{job.get("url")}" } for job in search_results ]
 
 
 
-    #TODO: javascript interaction
     @classmethod  
     @override
-    def extract_nextpage(cls, response):
-        return None
+    def nextractor(cls, response): #through some calcs
+    
+        total = response.json().get("total")
+        curr = parse_qs(urlparse(response.url).query).get("start", 0) + parse_qs(urlparse(response.url).query).get("limit", 0)
+        curr = sum(int(x) for x in curr)
+        
+        if total and curr < total: 
+            next = urlparse(response.url)
+            search_params = parse_qs(next.query)
+            search_params["start"] = curr 
+            search_params["limit"] = 100
+            next = next._replace(query=urlencode(search_params, doseq=True))
+
+            return urlunparse(next)
 
 
 
+    @classmethod
+    @override
+    def parse(self, response):
+        api_call = url.Url(
+            base=self.API_BASE,
+            params= self.__parse_to_api_params(response.url) | {"start": 0, "limit": 100},
+        )
 
+        yield response.follow(
+            str(api_call), 
+            headers=self.API_HEADERS,
+            callback=self.parse_from_api
+        )
+        
+        
 
+    @classmethod
+    def parse_from_api(self, response):
+
+        for x in self.url_extractor(response):
+            yield x
+                
+        if (next := self.nextractor(response)): 
+            yield response.follow(
+                next, 
+                headers=self.API_HEADERS,
+                callback=self.parse_from_api
+            )
 
 
 

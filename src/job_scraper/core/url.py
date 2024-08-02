@@ -17,8 +17,8 @@ class Url:
         
         out = str(self.__base.format(**self.__base_params))
         if len(self.__params) > 0:
-            out += "?" + urlencode(self.__params)
-
+            out += "?" + urlencode(self.__params, doseq=True)
+            
         return out
 
     def keys(self):
