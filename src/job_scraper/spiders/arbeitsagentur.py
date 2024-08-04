@@ -1,20 +1,27 @@
-from job_scraper.core import new_templ
+from job_scraper.core import new_templ, url
 import scrapy 
 
 from typing import override, Iterable
-import re
+from urllib.parse import parse_qsl, parse_qs, urlparse, urlencode, urlunparse
 
 
 class Arbeitsagentur_JobSearch_Scraper(new_templ.JobSearchScraper):
 
     name = "arbeitsagentur_jobsearch_spider"
-    #allowed_domains = ["arbeitsagentur.de"]
+    allowed_domains = ["arbeitsagentur.de"]
 
-    __general_search_url = "https://www.arbeitsagentur.de/jobsuche/suche"
-    __extractor = scrapy.linkextractors.LinkExtractor(
-        restrict_xpaths = "//div[@id = 'ergebnisliste']",
-        #restrict_text = "student"
-    )
+    API_PAGESIZE = 100
+
+    API_BASE = "https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobs"
+    API_HEADERS = {
+        "Accept":"application/json, text/plain, */*",
+        "Origin":"https://www.arbeitsagentur.de",
+        "Host":"rest.arbeitsagentur.de",
+        "Accept-Language":"de-DE,de;q=0.9",
+        "Accept-Encoding":"gzip, deflate, br",
+        "Connection":"keep-alive",
+        "X-API-Key":"jobboerse-jobsuche"
+    }
 
 
 
@@ -23,29 +30,51 @@ class Arbeitsagentur_JobSearch_Scraper(new_templ.JobSearchScraper):
     @classmethod  
     @override
     def url_extractor(cls, response) -> list[dict]:
-        return [ {"url_text": url.text, "url" : url.url} for url in cls.__extractor.extract_links(response) ]
+        return [ {"url_text": job.get("titel"), "url" : f"{"https://www.arbeitsagentur.de/jobsuche/jobdetail/"}{job.get("refnr")}"} for job in response.json().get("stellenangebote") or [] ]
 
 
-
-    #TODO: javascript interaction
     @classmethod  
     @override
     def nextractor(cls, response):
-        return None
+        data = response.json()
+        total = data.get("maxErgebnisse", 0)
+        page = data.get("page", 1)
+        size = data.get("size", cls.API_PAGESIZE)
+
+        if page * size < total:
+            next = urlparse(response.url)
+            search_params = parse_qs(next.query)
+            search_params["page"] = page + 1 
+            next = next._replace(query=urlencode(search_params, doseq=True))
+
+            return urlunparse(next)
+            
 
     @override
-    def parse(self, response):
-        #print("rest", response)
-        #print("content", response.body)
-        r = r"https://rest.arbeitsagentur.de/jobboerse/jobsuche-service/pc/v4/jobs?angebotsart=34&was=Mercedes%20Benz%20Group&berufsfeld=Informatik&arbeitgeber=Mercedes-Benz%20Group%20AG&page=2&size=25&pav=false&facetten=false"
+    def parse(cls, response):
+        api_call = url.Url(
+            base=cls.API_BASE,
+            params= dict(parse_qsl(urlparse(response.url).query)) | {"page": 1, "size": cls.API_PAGESIZE}
+        )
+        
+        yield response.follow(
+            str(api_call), 
+            headers=cls.API_HEADERS,
+            callback=cls.parse_api
+        )
+        
 
-        s = scrapy.http.Request(r, callback=self.api )
-        print(response.headers)
-        yield s
-
-    def api(cls, response):
-        print("rest", response)
-        print("content", response.body)
+    @classmethod
+    def parse_api(cls, response):
+        for x in cls.url_extractor(response):
+            yield x
+                
+        if (next := cls.nextractor(response)): 
+            yield response.follow(
+                next, 
+                headers=cls.API_HEADERS,
+                callback=cls.parse_api
+            )
 
 
 class Arbeitsagentur_JobInfo_Scraper(new_templ.JobInfoScraper):
