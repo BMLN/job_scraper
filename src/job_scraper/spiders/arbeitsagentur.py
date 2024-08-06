@@ -4,6 +4,8 @@ import scrapy
 from typing import override, Iterable
 from urllib.parse import parse_qsl, parse_qs, urlparse, urlencode, urlunparse
 
+import json
+
 
 class Arbeitsagentur_JobSearch_Scraper(new_templ.JobSearchScraper):
 
@@ -96,7 +98,7 @@ class Arbeitsagentur_JobInfo_Scraper(new_templ.JobInfoScraper):
     @classmethod     
     @override
     def extract_content(cls, selector) -> str:
-        return selector.xpath("//div[@class='ba-layout-tile']//p").get()
+        return selector.xpath("//div[@class='ba-layout-tile']//p").get() #should work based on structure, but doesnt. 
         
     @classmethod  
     @override
@@ -128,3 +130,22 @@ class Arbeitsagentur_JobInfo_Scraper(new_templ.JobInfoScraper):
     def extract_posting(cls, selector) -> str:
         return selector.xpath("//span[@id='detail-kopfbereich-veroeffentlichungsdatum']//text()").get()
 
+    @classmethod
+    @override
+    def jobinfo_extractor(cls, response) -> list[dict]:
+        data = response.xpath("//script[@id='ng-state']//text()").get() or {}
+        job = json.loads(data).get("jobdetail")
+
+        if job:
+            return [{
+                "title": job.get("stellenangebotsTitel"),
+                "content": job.get("stellenangebotsBeschreibung"), 
+                "company": job.get("firma"),
+                "field" : None,
+                "industry" : None,
+                "employment": job.get("stellenangebotsart"),
+                "location" : [ x.get("adresse", {}).get("ort") for x in job.get("stellenlokationen", []) ],
+                "posted": job.get("veroeffentlichungszeitraum", {}).get("von")
+            }]
+        else:
+            return super().jobinfo_extractor(response)
