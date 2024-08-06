@@ -100,7 +100,7 @@ class Arbeitsagentur_JobInfo_Scraper(new_templ.JobInfoScraper):
     def extract_content(cls, selector) -> str:
         return selector.xpath("//div[@class='ba-layout-tile']//p").get() #should work based on structure, but doesnt. 
         
-    @classmethod  
+    @classmethod
     @override
     def extract_company(cls, selector) -> str:
         return selector.xpath("//span[@id='detail-kopfbereich-firma']//text()").get()
