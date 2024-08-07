@@ -19,6 +19,19 @@ class Indeed_JobScraper(new_templ.JobSearchScraper):
         #restrict_text = "student" #filter is gonna be applied on the dataset separately
     )
 
+    custom_settings = {
+        "CFM_MODE": "STANDARD",
+        "CFM_SESSION_INIT_THRESHOLD" : 5,
+        "CFM_SESSION_EVAL_THRESHOLD" : 0.8,
+        "CFM_MULTI_THRESHOLD" : 1,
+        "CFM_MULTI_MINSESSIONS" : 5,
+        "CFM_MULTI_MAXSESSIONS" : 35,
+        "CFM_MAX_CREATED_SESSIONS" : 35
+    }
+
+
+
+
     #additionals? direct search?
     #@classmethod
     
@@ -33,13 +46,12 @@ class Indeed_JobScraper(new_templ.JobSearchScraper):
         return [ {"url_text": url.text, "url" : url.url} for url in cls.__extractor.extract_links(response) ]
 
 
-    #TODO: fix: problems if  less <5?
+    #TODO: fix: problems if less <5? still?
     @classmethod
     @override
     def nextractor(cls, response) -> str:
         nxt = response.xpath("//nav[@role='navigation']//li//a//@href").getall()
 
-        #return None #TODO
         if len(nxt) > 0:
             if nxt[-1] != "#":
                 url = str(nxt[-1])
@@ -57,7 +69,15 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
     name = "indeed_jobinfo_spider"
     allowed_domains = ["de.indeed.com"]
 
-
+    custom_settings = {
+        "CFM_MODE": "ROTATE",
+        "CFM_SESSION_INIT_THRESHOLD" : 5,
+        "CFM_SESSION_EVAL_THRESHOLD" : 0.8,
+        "CFM_MULTI_THRESHOLD" : 1,
+        "CFM_MULTI_MINSESSIONS" : 10,
+        "CFM_MULTI_MAXSESSIONS" : 35,
+        "CFM_MAX_CREATED_SESSIONS" : 35
+    }
 
     # interface requirements
     #
@@ -125,12 +145,12 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
 
     @classmethod       
     @override
-    def extract_posting(cls, selector) -> str: 
-        output = None
+    def extract_posting(cls, selector) -> str:         
         
-        job_data = selector.xpath("//script[@type='application/ld+json']//text()").get()
-        post_data = re.search(r"""(?<=\"datePosted\":\")[^\"]*""", job_data)
+        if (job_data := selector.xpath("//script[@type='application/ld+json']//text()").get()) == None:
+            return None 
+        
+        if (post_data := re.search(r"""(?<=\"datePosted\":\")[^\"]*""", job_data)) == None:
+            return None
 
-        if post_data: output = post_data.group()
-        
-        return output
+        return post_data.group()
