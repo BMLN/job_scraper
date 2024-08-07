@@ -4,6 +4,8 @@ from typing import override, Iterable
 
 from urllib.parse import urlencode, parse_qsl, parse_qs, urlparse, urlunparse
 
+from html import unescape as html_unescape
+import json
 
 
 
@@ -116,7 +118,7 @@ class GetInIT_JobInfo_Scraper(new_templ.JobInfoScraper):
     @classmethod              
     @override
     def extract_content(cls, selector) -> str:
-        return selector.xpath("(//div[@class='container']//div[contains(@class, 'JobDescription')]//section)").getall()
+        return "".join(selector.xpath("(//div[@class='container']//div[contains(@class, 'JobDescription')]//section)").getall())
    
     @classmethod     
     @override
@@ -129,7 +131,7 @@ class GetInIT_JobInfo_Scraper(new_templ.JobInfoScraper):
         jobinfos = selector.xpath("//div[contains(@class, 'JobInfo')]//div[contains(@class, 'JobInfo') and contains(@class, 'row')]")
 
         if len(jobinfos) > 0:
-            return jobinfos[0].getall()[1:]
+            return jobinfos[0].xpath(".//text()").getall()[1:]
 
     @classmethod
     @override
@@ -151,3 +153,23 @@ class GetInIT_JobInfo_Scraper(new_templ.JobInfoScraper):
     def extract_posting(cls, selector) -> str:
         return None
 
+
+
+    @classmethod
+    @override
+    def jobinfo_extractor(cls, response) -> list[dict]:
+        data = response.xpath("//head//script[@type='application/ld+json']//text()").get() or str({})
+        data = json.loads(data)
+        
+        return [{
+                "title": html_unescape(data.get("title")),
+                "content": cls.extract_content(response), 
+                "company": cls.extract_company(response),
+                "field" : html_unescape(data.get("industry")),
+                "industry" : None,
+                "employment": html_unescape(data.get("employmentType")),
+                "location" : cls.extract_location(response),
+                "posted": html_unescape(data.get("datePosted"))
+            }]
+
+    
