@@ -6,6 +6,7 @@
 from scrapy import signals
 from scrapy.http import Response, HtmlResponse, TextResponse, Request
 from scrapy.spidermiddlewares.httperror import HttpErrorMiddleware
+from scrapy.exceptions import CloseSpider 
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -13,8 +14,14 @@ from itemadapter import is_item, ItemAdapter
 
 from cloudscraper import create_scraper
 
+from itertools import repeat
 import pandas as pd
 from urllib.parse import urlparse
+import uuid
+
+
+from threading import Lock
+
 
 
 class JobScraperSpiderMiddleware:
@@ -221,43 +228,93 @@ class CloudFlareMiddleware:
 
 
 
+def rotate(l):
+    return l[1:] + l[:1]
+
+def index(l):
+    return l
+
+
 
 #TODO: read from settings and set defaults
 class CloudFlareMiddleware2:
     
-    CFM_SESSION_INIT_THRESHOLD = 5
-    CFM_SESSION_EVAL_THRESHOLD = 0.8
+    #Default params
+    DEFAULT_CFM_MODE = "STANDARD"
+
+
+    DEFAULT_CFM_SESSION_COUNT = 10
+    DEFAULT_CFM_SESSION_LIMIT = 20
+    DEFAULT_CFM_SESSION_INIT_THRESHOLD = 5
+    DEFAULT_CFM_SESSION_EVAL_THRESHOLD = 0.8
     
-    CFM_MULTI_THRESHOLD = 3
-    CFM_MULTI_MINSESSIONS = 3
-    CFM_MULTI_MAXSESSIONS = 10
-
-    CFM_MAX_CREATED_SESSIONS = 20
+    DEFAULT_CFM_MULTI_THRESHOLD = 1
+    DEFAULT_CFM_MULTI_RANGE = 3
 
 
-    def __init__(self, settings={}):
+
+    def __init__(self, crawler, settings={}):
+        
+        for cls_attr in dir(self):
+            if "DEFAULT_" in cls_attr and cls_attr.index("DEFAULT_") == 0:
+                if (cfm_var := cls_attr.replace("DEFAULT_", "", 1)) in settings: 
+                    setattr(self, cfm_var, settings.get(cfm_var))
+                else:
+                    setattr(self, cfm_var, getattr(self, cls_attr))        
+
+        self.crawler = crawler
+        self.lock = Lock()
+        self.sessioncount = 0
         self.__sessions = []
-        #TODO: settings init
-        #self.CFM_MULTI_THRESHOLD = 3
-        #self.CFM_MAX_CREATED_SESSIONS = 20
+
 
     @classmethod
     def from_crawler(cls, crawler):
-        return cls(crawler.settings)
+        return cls(crawler, crawler.settings)
 
-    def new_session(self, *args, **kwargs):
-        self.__sessions.append((new_sess := self.CfSession(len(self.__sessions) + 1, *args, **kwargs)))
-        
-        return new_sess
 
-    #TODO: cleaner
-    def eval_session(self, session):
-        if session.fails + session.success < self.CFM_SESSION_INIT_THRESHOLD:
-            return True
-        elif session.success / (session.fails + session.success) < self.CFM_SESSION_EVAL_THRESHOLD:
-            return False
+    def get_sessions2(self, session_key=0, retry_times=0):
+        session_key = session_key if session_key else 0
+        retry_times = retry_times if retry_times else 0
+
+        output = self.__sessions[session_key:] + self.__sessions[:session_key]
+        output = [ x for x in output if self.eval_session(x) ]
+        while len(self.__sessions) < self.CFM_MAX_CREATED_SESSIONS and len(output) < self.CFM_MULTI_MINSESSIONS:
+            output.append(self.new_session())
+
+        multi_active = retry_times >= self.CFM_MULTI_THRESHOLD
+
+        if len(output) == 0: 
+            raise CloseSpider
+
+        #manipulate sessionslist according to mode
+        if self.CFM_MODE == None:
+            output = [ output[0] ]
+            self.__sessions = self.__sessions
+        elif self.CFM_MODE == "STANDARD":
+            if output[0].session_key != session_key:
+                multi_active = True
+            self.__sessions = self.__sessions[session_key:] + self.__sessions[:session_key]
+
+        elif self.CFM_MODE == "ROTATE": #ofc it doesnt work, where is rotate stored?
+            output = output[1:] + output[:1] #error if only 1
+            self.__sessions = self.__sessions[1:] + self.__sessions[:1]
+        elif self.CFM_MODE == "BEST":
+            print("TODO")
+            #output = best
+        elif self.CFM_MODE == "RANDOM":
+            print("TODO")
+            #output = random
+
+        #return accordingly
+        if multi_active:
+            output = [ output[0] ]
         else:
-            return True 
+            output = output[:min(self.CFM_MULTI_MAXSESSIONS, len(output))]
+
+        print(f"{len(self.__sessions)} total sessions, {len([ session for session in self.__sessions if self.eval_session(session) ])} working")
+
+        return output
 
 
     def get_sessions(self, session_key=0, retry_times=0):
@@ -282,8 +339,14 @@ class CloudFlareMiddleware2:
 
 
     def process_request(self, request, spider):
-        
-        for session in self.get_sessions(request.meta.get("session_key"), request.meta.get("retry_times")):
+        self.lock.acquire() #even necessary?
+        try:
+            sessions = self.get_sessions2(request.meta.get("session_key"), request.meta.get("retry_times"))
+        #except: #how should it fail?
+        finally:
+            self.lock.release()
+
+        for session in sessions:
             response = session.process_request(request)
                 
             if 200 <= response.status < 300:
@@ -294,28 +357,179 @@ class CloudFlareMiddleware2:
 
 
 
+
+    def get_session3(session_key=None):
+
+        while len(self.__sessions) < self.CFM_MAX_CREATED_SESSIONS and len(output) < self.CFM_MULTI_MINSESSIONS:
+            self.new_session()
+        output = next((x for x in self.__sessions if self.eval_session(x)), None )
+        
+        if output == None:
+            raise CloseSpider("err")
+
+        match self.CFM_MODE:
+            case "STANDARD":
+                return output
+            case "ROTATE":
+                self.__sessions = self.__sessions[1:] + self.__sessions[:1] 
+                return output 
+            case "RANDOM":
+                print("TODO")
+            case "BEST":
+                print("TODO")
+            case _:
+                print("TODO")
+
+
+    def get_session5(self):
+
+        #mode defs
+        match self.CFM_MODE:
+            case "STANDARD": #EXHAUST
+                cfm_sort = lambda x : x[1:] + x[:1] if x and previous_request and previous_request.session_key == x[0].session_key and x[0].history[0] != "SUCCESS" else x 
+            case "ROTATE":
+                cfm_sort = lambda x : x[1:] + x[:1] if x and previous_request and previous_request.session_key == x[0].session_key else x
+            case "RANDOM":
+                print("TODO")
+            case "BEST":
+                print("TODO")
+            case _:
+                print("TODO")
+
+
+        with self.lock:
+            previous_request = self.__sessions[0] if self.__sessions else None
+            new_sessions = []
+            
+            #eval and fill sessions
+            while len(new_sessions) < min(self.CFM_SESSION_COUNT, self.CFM_SESSION_LIMIT - self.sessioncount):
+                if self.__sessions:
+                    if (session := self.__sessions.pop()).eval():
+                        new_sessions.append(session)
+                else:
+                    self.sessioncount += 1
+                    new_sessions.append(self.CfSession(self.CFM_SESSION_INIT_THRESHOLD, self.CFM_SESSION_EVAL_THRESHOLD)))
+
+            #update and apply mode 
+            self.__sessions = cfm_sort(new_sessions)
+            
+            #return if any
+            if self.__sessions:
+                return self.__sessions[0]
+
+
+
+    #TODO: session creation
+    def get_session4(self, session_key=None, retry_times=None):
+        """ returns the first usable session according to the CFM_MODE
+        """
+        
+        #assert len(self.__sessions) > 0, f"CFM can't get a session with {len(self.sessions)} sessions!"
+
+        new_sessions = self.CFM_MULTI_MINSESSIONS
+        out_index = None
+
+        match self.CFM_MODE:
+        
+            case "STANDARD":
+                for x, session in enumerate(self.__sessions):
+                    if self.history[0].session_key == session.sess_key and self.history[0].eval():
+                        out_index = x
+                        break
+                    if self.history[0].session_key != session.sess_key and session.eval():
+                        out_index = x
+                        break
+                        
+
+            case "ROTATE":
+                for x, session in enumerate(self.__sessions):
+                    if self.history[0].session_key != session.sess_key and self.__sessions.eval():
+                        out_index = x
+                        break
+                        
+            case "RANDOM":
+                print("TODO")
+
+            case "BEST":
+                print("TODO")
+
+            case _:
+                raise ValueError("CFM_MODE has to match one of the modes ['STANDARD', 'ROTATE', 'RANDOM', 'BEST']")
+                
+        if out_index:
+            self.__sessions = self.__sessions[out_index:] + self.__sessions[:out_index]
+            return self.__sessions[0]
+
+        
+        
+
+    def process_request(self, request, spider):
+
+        if request.meta.get("retry_times", 0) >= self.CFM_MULTI_THRESHOLD or (self.CFM_MODE == "STANDARD" and self.__sessions and self.__sessions[0].history[0] != "SUCCESS"):
+            request_range = self.DEFAULT_CFM_MULTI_RANGE
+        else:
+            request_range = 1
+
+        for session in ( self.get_session5() for x in range(request_range) ): #cleaner iterator?
+            if session:            
+                response = session.process_request(request)
+                
+                if 200 <= response.status < 300:
+                    break
+                    
+            else:
+                break
+                        
+        if not session or not response: #not response necessary?
+            self.crawler.engine.close_spider(spider, "CFM has no available session left")
+            raise CloseSpider(reason="stop me baby") #this on its own doesnt trigger twisted from middleware: github.com/scrapy/issues/2578
+
+        return response
+
+
+
+
+
     class CfSession():
-        def __init__(self, session_key, *args, **kwargs):
+        def __init__(self, init_threshold=0, eval_threshold=1, *args, **kwargs):
             self.session = create_scraper(*args, **kwargs)
-            self.session_key = session_key
+            self.session_key = uuid.uuid4()
+            self.history = [ None for x in range(1) ]
             self.success = 0
             self.fails = 0
+            self.init_threshold = init_threshold
+            self.eval_threshold = eval_threshold
 
         @classmethod
         def to_req_params(cls, request):
-            PARAMS = ["method", "url", "params", "data", "json", "headers", "cookies", "files", "auth", "timeout", "allow_redirects", "proxies", "verify", "stream", "cert"]
-
+            PARAMS = ["method", "url", "params", "body", "data", "json", "headers", "cookies", "files", "auth", "timeout", "allow_redirects", "proxies", "verify", "stream", "cert"]
             output =  { key : value for key, value in { key if key[0] != "_" else key[1:] : value for key, value in request.__dict__.items() }.items() if key in PARAMS }
+            
             output["headers"] = dict(output["headers"].to_unicode_dict())
+            if "body" in output: output["data"] = output.pop("body")
 
             return output
 
+        def eval(self):            
+            if (total_requests := self.fails + self.success): 
+                if total >= self.init_threshold:
+                    #if self.history: # -> this equals retry times
+                    #    if not all(( x == "SUCCESS" for x in self.history if x )):
+                    #        return False
+                        
+                    if self.success / (self.fails + self.success) < self.eval_threshold:
+                        return False
+
+            return True 
+
+
         def send(self, *args, **kwargs):
-            for x in range(400000000): #super cool very gud delay func
+            #for x in range(400000000): #super cool very gud delay func
+            for x in range(200000000):
                 pass
 
             try:
-                with self.session.request(*args, **kwargs) as resp:
+                with self.session.request(timeout=60, *args, **kwargs) as resp:
                     return resp
                 
 
@@ -327,7 +541,6 @@ class CloudFlareMiddleware2:
         def create_scrapyresponse(self, request, response):
             output = HtmlResponse(request.url, status=500, request=request, encoding="utf-8")
 
-            #TODO: add url check if still base
             if not response:
                 return output
                 
@@ -357,13 +570,16 @@ class CloudFlareMiddleware2:
 
         def process_request(self, request):
             params = self.to_req_params(request)
-
             response = self.send(**params)
             response = self.create_scrapyresponse(request, response)
 
             if 200 <= response.status < 300:
+                if self.history: 
+                    self.history = self.history[1:] + [ "SUCCESS" ]
                 self.success += 1
             else:
+                if self.history: 
+                    self.history = self.history[1:] + [ "FAILED"]
                 self.fails += 1
 
             return response

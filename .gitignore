@@ -2,6 +2,7 @@
 .env
 output
 input
+sources
 html
 test.sh
 xpathstuff.py

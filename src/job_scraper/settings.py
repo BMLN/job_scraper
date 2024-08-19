@@ -62,7 +62,8 @@ DOWNLOADER_MIDDLEWARES = {
     #"scrapeops_scrapy_proxy_sdk.scrapeops_scrapy_proxy_sdk.ScrapeOpsScrapyProxySdk" : 725
     #"job_scraper.middlewares.JobScraperDownloaderMiddleware": 543,
     #"scrapy_cloudflare_middleware.middlewares.CloudFlareMiddleware", 560,
-    "job_scraper.middlewares.CloudFlareMiddleware" : 100
+    #"job_scraper.middlewares.CloudFlareMiddleware" : 200
+    "job_scraper.middlewares.CloudFlareMiddleware2" : 200
 }
 
 # Enable or disable extensions
@@ -114,3 +115,4 @@ FEED_EXPORT_ENCODING = "utf-8"
 #         "item_classes": outs #[ dict ]
 #     }
 # }
+REDIRECT_ENABLED = False
