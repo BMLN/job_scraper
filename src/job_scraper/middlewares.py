@@ -240,7 +240,7 @@ def index(l):
 class CloudFlareMiddleware2:
     
     #Default params
-    DEFAULT_CFM_MODE = "STANDARD"
+    DEFAULT_CFM_MODE = "EXHAUST"
 
 
     DEFAULT_CFM_SESSION_COUNT = 10
@@ -385,7 +385,7 @@ class CloudFlareMiddleware2:
 
         #mode defs
         match self.CFM_MODE:
-            case "STANDARD": #EXHAUST
+            case "EXHAUST": 
                 cfm_sort = lambda x : x[1:] + x[:1] if x and previous_request and previous_request.session_key == x[0].session_key and x[0].history[0] != "SUCCESS" else x 
             case "ROTATE":
                 cfm_sort = lambda x : x[1:] + x[:1] if x and previous_request and previous_request.session_key == x[0].session_key else x
@@ -394,7 +394,7 @@ class CloudFlareMiddleware2:
             case "BEST":
                 print("TODO")
             case _:
-                print("TODO")
+                raise ValueError("CFM_MODE has to match one of the modes ['STANDARD', 'ROTATE', 'RANDOM', 'BEST']")
 
 
         with self.lock:
@@ -465,7 +465,7 @@ class CloudFlareMiddleware2:
 
     def process_request(self, request, spider):
 
-        if request.meta.get("retry_times", 0) >= self.CFM_MULTI_THRESHOLD or (self.CFM_MODE == "STANDARD" and self.__sessions and self.__sessions[0].history[0] != "SUCCESS"):
+        if request.meta.get("retry_times", 0) >= self.CFM_MULTI_THRESHOLD or (self.CFM_MODE == "EXHAUST" and self.__sessions and self.__sessions[0].history[0] != "SUCCESS"):
             request_range = self.DEFAULT_CFM_MULTI_RANGE
         else:
             request_range = 1
