@@ -44,7 +44,16 @@ class Stepstone_JobScraper(new_templ.JobSearchScraper):
         ],
     }
 
-
+    custom_settings = {
+        "CFM_MODE": "ROTATE",
+        "CMF_SESSION_COUNT" : 30,
+        "CFM_SESSION_LIMIT" : 50,
+        "CFM_SESSION_INIT_THRESHOLD" : 10,
+        "CFM_SESSION_EVAL_THRESHOLD" : 0.2,
+        "CFM_MULTI_THRESHOLD" : 0,
+        "CFM_MULTI_RANGE" : 30,
+        "RETRY_TIMES" : 3
+    }
 
 
 
@@ -54,7 +63,7 @@ class Stepstone_JobScraper(new_templ.JobSearchScraper):
     @classmethod
     @override
     def url_extractor(cls, response) -> [dict]:
-        return [ {"url_text": job.get("title"), "url" : f"{"https://https://www.stepstone.de"}{job.get("url")}"} for job in (response.json().get("items") or []) ]
+        return [ {"url_text": job.get("title"), "url" : f"{"https://www.stepstone.de"}{job.get("url")}"} for job in (response.json().get("items") or []) ]
 
 
     @classmethod
@@ -105,6 +114,17 @@ class Stepstone_InfoScraper(new_templ.JobInfoScraper):
     allowed_domains = ["stepstone.de"]
 
 
+
+    custom_settings = {
+        "CFM_MODE": "ROTATE",
+        "CMF_SESSION_COUNT" : 30,
+        "CFM_SESSION_LIMIT" : 50,
+        "CFM_SESSION_INIT_THRESHOLD" : 10,
+        "CFM_SESSION_EVAL_THRESHOLD" : 0.2,
+        "CFM_MULTI_THRESHOLD" : 0,
+        "CFM_MULTI_RANGE" : 30,
+        "RETRY_TIMES" : 3
+    }
 
 
 
@@ -165,3 +185,23 @@ class Stepstone_InfoScraper(new_templ.JobInfoScraper):
     @override
     def extract_posting(cls, selector) -> str:
         return selector.xpath("//div[@id='job-ad-content']//div[@data-at='job-ad-header']").xpath(".//li[contains(@class, 'date')]//text()").get()
+
+
+
+    
+    @classmethod
+    @override
+    def jobinfo_extractor(cls, response) -> list[dict]:
+        data = response.xpath("//script[@type='application/ld+json']//text()").get() or str({})
+        data = json.loads(data)
+        
+        return [{
+                "title": data.get("title"),
+                "content": data.get("description"), 
+                "company": cls.extract_company(response),
+                "field" : None,
+                "industry" : data.get("industry"),
+                "employment": data.get("employmentType"),
+                "location" : cls.extract_location(response),
+                "posted": data.get("datePosted")
+            }]

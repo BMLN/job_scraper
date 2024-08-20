@@ -82,7 +82,7 @@ class Monster_JobScraper(new_templ.JobSearchScraper):
     @classmethod
     @override
     def url_extractor(cls, response) -> [dict]:
-        job_postings = [ job.get("jobPosting") or {} for job in (response.json().get("jobResults") or []) ]
+        job_postings = [ job.get("jobPosting", {}) for job in (response.json().get("jobResults") or []) ]
         
         return [
             {
@@ -133,8 +133,8 @@ class Monster_JobScraper(new_templ.JobSearchScraper):
         
 
     @classmethod
-    def parse_from_api(self, response):
-        for x in self.url_extractor(response):
+    def parse_from_api(cls, response):
+        for x in cls.url_extractor(response):
             yield x
                 
         if (next := self.nextractor(response)): 
@@ -142,9 +142,9 @@ class Monster_JobScraper(new_templ.JobSearchScraper):
             yield response.follow(
                 response.url, 
                 method="POST", 
-                headers=self.API_HEADERS,
+                headers=cls.API_HEADERS,
                 body=next,
-                callback=self.parse_from_api
+                callback=cls.parse_from_api
             )
 
 

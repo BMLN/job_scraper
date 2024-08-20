@@ -18,6 +18,20 @@ class LinkedIn_JobScraper(new_templ.JobSearchScraper):
     API_BASE = "https://de.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
     
 
+    custom_settings = {
+        "CFM_MODE": "ROTATE",
+        "CFM_SESSION_INIT_THRESHOLD" : 10,
+        "CFM_SESSION_EVAL_THRESHOLD" : 0.2,
+        "CFM_SESSION_COUNT" : 30,
+        "CFM_SESSION_LIMIT" : 50,
+        "CFM_MULTI_THRESHOLD" : 0,
+        "CFM_MULTI_RANGE" : 30,
+    }
+
+
+
+
+
     #interface requirements
 
     @classmethod
@@ -76,6 +90,19 @@ class LinkedIn_InfoScraper(new_templ.JobInfoScraper):
     name = "linkedin_jobinfo_spider"
     allowed_domains = ["de.linkedin.com"]
     
+
+
+    custom_settings = {
+        "CFM_MODE": "ROTATE",
+        "CFM_SESSION_INIT_THRESHOLD" : 10,
+        "CFM_SESSION_EVAL_THRESHOLD" : 0.2,
+        "CFM_SESSION_COUNT" : 30,
+        "CFM_SESSION_LIMIT" : 50,
+        "CFM_MULTI_THRESHOLD" : 0,
+        "CFM_MULTI_RANGE" : 30,
+        "RETRY_TIMES" : 5
+    }
+
 
 
 

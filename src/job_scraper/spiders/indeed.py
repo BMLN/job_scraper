@@ -20,13 +20,13 @@ class Indeed_JobScraper(new_templ.JobSearchScraper):
     )
 
     custom_settings = {
-        "CFM_MODE": "STANDARD",
+        "CFM_MODE": "ROTATE",
         "CFM_SESSION_INIT_THRESHOLD" : 5,
         "CFM_SESSION_EVAL_THRESHOLD" : 0.8,
+        "CFM_SESSION_COUNT" : 10,
+        "CFM_SESSION_LIMIT" : 35,
         "CFM_MULTI_THRESHOLD" : 1,
-        "CFM_MULTI_MINSESSIONS" : 5,
-        "CFM_MULTI_MAXSESSIONS" : 35,
-        "CFM_MAX_CREATED_SESSIONS" : 35
+        "CFM_MULTI_RANGE" : 5,
     }
 
 
@@ -73,10 +73,10 @@ class Indeed_InfoScraper(new_templ.JobInfoScraper):
         "CFM_MODE": "ROTATE",
         "CFM_SESSION_INIT_THRESHOLD" : 5,
         "CFM_SESSION_EVAL_THRESHOLD" : 0.8,
+        "CFM_SESSION_COUNT" : 10,
+        "CFM_SESSION_LIMIT" : 35,
         "CFM_MULTI_THRESHOLD" : 1,
-        "CFM_MULTI_MINSESSIONS" : 10,
-        "CFM_MULTI_MAXSESSIONS" : 35,
-        "CFM_MAX_CREATED_SESSIONS" : 35
+        "CFM_MULTI_RANGE" : 5,
     }
 
     # interface requirements
