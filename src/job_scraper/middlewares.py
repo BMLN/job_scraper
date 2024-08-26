@@ -408,7 +408,7 @@ class CloudFlareMiddleware2:
                         new_sessions.append(session)
                 else:
                     self.sessioncount += 1
-                    new_sessions.append(self.CfSession(self.CFM_SESSION_INIT_THRESHOLD, self.CFM_SESSION_EVAL_THRESHOLD)))
+                    new_sessions.append(self.CfSession(self.CFM_SESSION_INIT_THRESHOLD, self.CFM_SESSION_EVAL_THRESHOLD))
 
             #update and apply mode 
             self.__sessions = cfm_sort(new_sessions)

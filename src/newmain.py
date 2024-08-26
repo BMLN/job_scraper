@@ -7,18 +7,18 @@ from twisted.internet import defer, reactor
 
 
 from job_scraper.core.base_scraper import BaseScraper
-from job_scraper.spiders import new_indeed, new_stepstone
+from job_scraper.spiders import indeed, stepstone
 
 from inspect import ismethod, getmro
 
 
 
 AVAIL_EXTRACTIONS = [
-    new_indeed.Indeed_JobScraper,
-    new_indeed.Indeed_InfoScraper,
+    indeed.Indeed_JobScraper,
+    indeed.Indeed_InfoScraper,
     
-    new_stepstone.Stepstone_JobScraper,
-    new_stepstone.Stepstone_InfoScraper
+    stepstone.Stepstone_JobScraper,
+    stepstone.Stepstone_InfoScraper
 ]
 
 
