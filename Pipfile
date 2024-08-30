@@ -35,82 +35,44 @@ indeed2 = "bash -c 'cd src && pipenv run scrapy crawl newindeed_jobinfo_spider -
 #stepstone_jobs = "bash -c 'cd src && pipenv run scrapy crawl stepstone_jobsearch_spider -O ../output/stepstone_jobs.csv:csv -a inputs=https://www.stepstone.de/jobs/werkstudent-in-it?q=Werkstudent%2fin+IT'"
 #linkedin_jobs = "bash -c 'cd src && pipenv run scrapy crawl linkedin_jobsearch_spider -O ../output/linkedin_jobs.csv:csv -a inputs=https://de.linkedin.com/jobs/search?keywords=Werkstudent%20IT&location=Deutschland '"
 #linkedin_infos = "bash -c 'cd src && pipenv run scrapy crawl linkedin_jobinfo_spider -O ../output/linkedin_infos.csv:csv -a inputs=../output/linkedin_jobs.csv'"
-
 #monster_jobs_infos = "bash -c 'cd src && pipenv run scrapy crawl monster_jobsearch_spider -O ../output/monster_jobs_infos.csv:csv -a inputs=https://www.monster.de/jobs/suche?q=Werkstudent+IT '"
 #arbeitsagentur_jobs = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobsearch_spider -O ../output/arbeitsagentur_jobs.csv:csv -a inputs=https://www.arbeitsagentur.de/jobsuche/suche?angebotsart=34\\&was=Werkstudent%20IT'"
-
-
-
-
 #arbeitsagentur_jobs1 = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobsearch_spider -O ../output/arbeitsagentur_jobs1.csv:csv -a inputs=https://www.arbeitsagentur.de/jobsuche/suche?angebotsart=1\\&was=Werkstudent%2Fin%20IT'"
 #arbeitsagentur_jobs2 = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobsearch_spider -O ../output/arbeitsagentur_jobs2.csv:csv -a inputs=https://www.arbeitsagentur.de/jobsuche/suche?angebotsart=34\\&was=Werkstudent%2Fin%20IT'"
 #arbeitsagentur_infos1 = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobinfo_spider -O ../output/arbeitsagentur_infos1.csv:csv -a inputs=../output/arbeitsagentur_jobs1.csv'"
 #arbeitsagentur_infos2 = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobinfo_spider -O ../output/arbeitsagentur_infos2.csv:csv -a inputs=../output/arbeitsagentur_jobs2.csv'"
-
 #getinit_jobs = "bash -c 'cd src && pipenv run scrapy crawl getinit_jobsearch_spider -O ../output/getinit_jobs.csv:csv -a inputs=https://www.get-in-it.de/jobsuche?thematicPriority=5\\&thematicPriority=47\\&thematicPriority=35\\&thematicPriority=40\\&thematicPriority=24\\&thematicPriority=3\\&thematicPriority=51\\&thematicPriority=41\\&thematicPriority=44\\&thematicPriority=45\\&thematicPriority=39\\&thematicPriority=37\\&thematicPriority=3\\&thematicPriority=36 '"
 #getinit_infos = "bash -c 'cd src && pipenv run scrapy crawl getinit_jobinfo_spider -O ../output/getinit_infos.csv:csv -a inputs=../output/getinit_jobs.csv'"
-
 #indeed_jobs = "bash -c 'cd src && pipenv run scrapy crawl indeed_jobsearch_spider -O ../output/indeed_jobs.csv:csv -a inputs=https://de.indeed.com/jobs?q=Werkstudent+IT\\&l=Deutschland'"
 #indeed_infos = "bash -c 'cd src && pipenv run scrapy crawl indeed_jobinfo_spider -O ../output/indeed_infos.csv:csv -a inputs=../output/indeed_jobs.csv'"
-
 #linkedin_jobs = "bash -c 'cd src && pipenv run scrapy crawl linkedin_jobsearch_spider -O ../output/linkedin_jobs.csv:csv -a inputs=https://de.linkedin.com/jobs/search?keywords=Werkstudent%20IT'"
 #linkedin_infos = "bash -c 'cd src && pipenv run scrapy crawl linkedin_jobinfo_spider -O ../output/linkedin_infos.csv:csv -a inputs=../output/linkedin_jobs.csv'"
-
-
 #stepstone_jobs = "bash -c 'cd src && pipenv run scrapy crawl stepstone_jobsearch_spider -O ../output/stepstone_jobss.csv:csv -a inputs=https://www.stepstone.de/jobs/werkstudent-in-it?q=Werkstudent%2fin+IT'"
 #stepstone_infos = "bash -c 'cd src && pipenv run scrapy crawl stepstone_jobinfo_spider -O ../output/stepstone_infos.csv:csv -a inputs=../output/stepstone_jobs.csv'"
-
-
-
-
-
-
-stopperich = "bash -c 'cd src && pipenv run scrapy crawl getinit_jobinfo_spider -O ../output/asd.csv:csv -a inputs=../output/getinit_jobs.csv'"
-
-
-
-
-
-
-
-
-
-arbeitsagentur_jobs = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobsearch_spider $@' TOMAKEITWORKVALUE"
+arbeitsagentur_jobs = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl arbeitsagentur_jobsearch_spider $@' TOMAKEITWORKVALUE"
 arbeitsagentur_jobs_default1 = "pipenv run arbeitsagentur_jobs -O ../output/arbeitsagentur_jobs1.csv:csv -a inputs=https://www.arbeitsagentur.de/jobsuche/suche?angebotsart=1\\&was=Werkstudent%2Fin%20IT"
 arbeitsagentur_jobs_default2 = "pipenv run arbeitsagentur_jobs -O ../output/arbeitsagentur_jobs2.csv:csv -a inputs=https://www.arbeitsagentur.de/jobsuche/suche?angebotsart=34\\&was=Werkstudent%2Fin%20IT"
-arbeitsagentur_infos = "bash -c 'cd src && pipenv run scrapy crawl arbeitsagentur_jobinfo_spider $@' TOMAKEITWORKVALUE"
+arbeitsagentur_infos = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl arbeitsagentur_jobinfo_spider $@' TOMAKEITWORKVALUE"
 arbeitsagentur_infos_default1 = "pipenv run arbeitsagentur_infos -O ../output/arbeitsagentur_infos1.csv:csv -a inputs=../output/arbeitsagentur_jobs1.csv"
 arbeitsagentur_infos_default2 = "pipenv run arbeitsagentur_infos -O ../output/arbeitsagentur_infos2.csv:csv -a inputs=../output/arbeitsagentur_jobs2.csv"
-
-
-
-getinit_jobs = "bash -c 'cd src && pipenv run scrapy crawl getinit_jobsearch_spider $@' TOMAKEITWORKVALUE"
+getinit_jobs = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl getinit_jobsearch_spider $@' TOMAKEITWORKVALUE"
 getinit_jobs_default = "pipenv run getinit_jobs -O ../output/getinit_jobs.csv:csv -a inputs=https://www.get-in-it.de/jobsuche?thematicPriority=5\\&thematicPriority=47\\&thematicPriority=35\\&thematicPriority=40\\&thematicPriority=24\\&thematicPriority=3\\&thematicPriority=51\\&thematicPriority=41\\&thematicPriority=44\\&thematicPriority=45\\&thematicPriority=39\\&thematicPriority=37\\&thematicPriority=3\\&thematicPriority=36"
-getinit_infos = "bash -c 'cd src && pipenv run scrapy crawl getinit_jobinfo_spider $@' TOMAKEITWORKVALUE"
+getinit_infos = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl getinit_jobinfo_spider $@' TOMAKEITWORKVALUE"
 getinit_infos_default = "pipenv run getinit_infos -O ../output/getinit_infos.csv:csv -a inputs=../output/getinit_jobs.csv"
-
-
-
-indeed_jobs = "bash -c 'cd src && pipenv run scrapy crawl indeed_jobsearch_spider $@' TOMAKEITWORKVALUE"
+indeed_jobs = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl indeed_jobsearch_spider $@' TOMAKEITWORKVALUE"
 indeed_jobs_default = "pipenv run indeed_jobs -O ../output/indeed_jobs.csv:csv -a inputs=https://de.indeed.com/jobs?q=Werkstudent+IT\\&l=Deutschland"
-indeed_infos = "bash -c 'cd src && pipenv run scrapy crawl indeed_jobinfo_spider $@' TOMAKEITWORKVALUE"
+indeed_infos = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl indeed_jobinfo_spider $@' TOMAKEITWORKVALUE"
 indeed_infos_default = "pipenv run indeed_infos -O ../output/indeed_infos.csv:csv -a inputs=../output/indeed_jobs.csv"
-
-
-
-linkedin_jobs = "bash -c 'cd src && pipenv run scrapy crawl linkedin_jobsearch_spider $@' TOMAKEITWORKVALUE" 
+linkedin_jobs = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl linkedin_jobsearch_spider $@' TOMAKEITWORKVALUE" 
 linkeind_jobs_default = "pipenv run linkedin_jobs -O ../output/linkedin_jobs.csv:csv -a inputs=https://de.linkedin.com/jobs/search?keywords=Werkstudent%20IT"
-linkedin_infos = "bash -c 'cd src && pipenv run scrapy crawl linkedin_jobinfo_spider $@' TOMAKEITWORKVALUE" 
+linkedin_infos = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl linkedin_jobinfo_spider $@' TOMAKEITWORKVALUE" 
 linkedin_infos_default = "pipenv run linkedin_infos -O ../output/linkedin_infos.csv:csv -a inputs=../output/linkedin_jobs.csv"
-
-
-
-monster_jobs_infos = "bash -c 'cd src && pipenv run scrapy crawl monster_jobsearch_spider $@' TOMAKEITWORKVALUE"
+monster_jobs_infos = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl monster_jobsearch_spider $@' TOMAKEITWORKVALUE"
 monster_jobs_infos_default = "pipenv run monster_jobs_infos -O ../output/monster_jobs_infos.csv:csv -a inputs=https://www.monster.de/jobs/suche?q=Werkstudent+IT"
-
-
-
-stepstone_jobs = "bash -c 'cd src && pipenv run scrapy crawl stepstone_jobsearch_spider $@' TOMAKEITWORKVALUE"
+stepstone_jobs = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl stepstone_jobsearch_spider $@' TOMAKEITWORKVALUE"
 stepstone_jobs_default = "pipenv run stepstone_jobs -O ../output/stepstone_jobs.csv:csv -a inputs=https://www.stepstone.de/jobs/werkstudent-in-it?q=Werkstudent%2fin+IT"
-stepstone_infos = "bash -c 'cd src && pipenv run scrapy crawl stepstone_jobinfo_spider $@' TOMAKEITWORKVALUE"
+stepstone_infos = "bash -c 'cd \"$(dirname \"$VIRTUAL_ENV\")/src\" && pipenv run scrapy crawl stepstone_jobinfo_spider $@' TOMAKEITWORKVALUE"
 stepstone_infos_default = "pipenv run stepstone_infos -O ../output/stepstone_infos.csv:csv -a inputs=../output/stepstone_jobs.csv"
+
+
+totot = "bash -c 'cd \"$(dirname $VIRTUAL_ENV)/src\" && echo $(pwd)'" 
