@@ -512,7 +512,7 @@ class CloudFlareMiddleware2:
 
         def eval(self):            
             if (total_requests := self.fails + self.success): 
-                if total >= self.init_threshold:
+                if total_requests >= self.init_threshold:
                     #if self.history: # -> this equals retry times
                     #    if not all(( x == "SUCCESS" for x in self.history if x )):
                     #        return False
