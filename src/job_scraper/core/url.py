@@ -1,6 +1,7 @@
 from urllib.parse import urlencode, urlparse
 from string import Formatter
 import pandas as pd
+from os.path import isfile, getsize
 
 #TODO: init (from not setting correctly)
 class Url:
@@ -50,14 +51,19 @@ class Url:
 
 
     def from_file(path_to_file):
-        output = pd.DataFrame()
 
-        if path_to_file.endswith(".csv"):
-            data = pd.read_csv(path_to_file)
-        elif path_to_file.endswith(".json"):
-            data = pd.read_json(path_to_file)
+        if (isfile(path_to_file) and getsize(path_to_file) > 0) == False:
+            return [] #or error?
+            
         else:
-            raise Exception("unrecognized input type")
+            if path_to_file.endswith(".csv"):
+                data = pd.read_csv(path_to_file)
+            elif path_to_file.endswith(".json"):
+                data = pd.read_json(path_to_file)
+            else:
+                raise Exception("unrecognized input type")
+
+            return [ Url(x) for x in data["url"].values.tolist() ]
 
         #TODO
         #if ("url" in data ) == False:
@@ -70,9 +76,6 @@ class Url:
         # output["keys"] = data.apply(lambda x: x in Url(x).keys(),  axis=1) 
         # #data = [ x for x in data.to_dict("records") ]
         #FOLLOWING OMNLY FOR FAST USABILITY
-        data = [ Url(x) for x in data["url"].values.tolist() ]
-
-        return data
 
 
     def base_param(self, key, value):
